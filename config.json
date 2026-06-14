@@ -1,15 +1,20 @@
 {
   "firebaseUrl": "https://lor-stats-4d486-default-rtdb.europe-west1.firebasedatabase.app",
-  "regions": ["europe"],
+  "regions": ["europe", "americas", "asia"],
   "gameTypeAllow": ["Ranked"],
   "maxWindowDays": 21,
   "patchStart": "2026-06-03",
-  "maxRequestsPerRun": 450,
-  "maxMatchesPerPuuid": 20,
+  "maxRequestsPerRun": 200,
+  "maxMatchDetailsPerRun": 15,
+  "maxMatchesPerPuuid": 5,
   "maxFrontier": 6000,
   "maxProcessedIds": 120000,
   "champRefreshHours": 168,
-  "seedRiotIds": ["Storyteller#7X3Y"],
+  "seeds": {
+    "europe": ["Storyteller#7X3Y"],
+    "americas": ["theStoryteller#7XZY"],
+    "asia": ["Mfaalb#apac"]
+  },
   "dataDragonSets": [
     "set1", "set2", "set3", "set4", "set5", "set6", "set6cde",
     "set7", "set7b", "set8", "set9", "set10", "set11", "set12"

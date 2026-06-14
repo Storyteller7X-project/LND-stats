@@ -27,16 +27,21 @@ const CONFIG_PATH = path.join(process.cwd(), 'config.json');
 const STATS_PATH = path.join(process.cwd(), 'data', 'stats.json');
 
 const DEFAULT_CONFIG = {
-  regions: ['europe'],            // clustery: americas | europe | asia
+  regions: ['europe', 'americas', 'asia'],   // clustery
   gameTypeAllow: ['Ranked'],      // ověř v logu DISTINCT a uprav podle reality
   maxWindowDays: 21,              // kolik dní bucketů držet (14d + rezerva na patch)
-  patchStart: '2026-06-01',       // začátek aktuálního patche (uprav každý patch)
-  maxRequestsPerRun: 450,         // strop requestů na jeden běh (pod 500/10min)
-  maxMatchesPerPuuid: 20,         // kolik match IDs řešit na hráče
-  maxFrontier: 6000,              // strop velikosti crawl fronty ve stavu
+  patchStart: '2026-06-03',       // začátek aktuálního patche (uprav každý patch)
+  maxRequestsPerRun: 200,         // celkový backstop (rate limiter + MD cap jsou primární)
+  maxMatchDetailsPerRun: 15,      // detailů zápasů/běh (×6 běhů/hod = 90, pod 100/hod)
+  maxMatchesPerPuuid: 5,          // radši víc hráčů než hodně zápasů jednoho
+  maxFrontier: 6000,              // strop velikosti crawl fronty na region
   maxProcessedIds: 120000,        // strop dedup setu (FIFO prune)
   champRefreshHours: 168,         // jak často obnovovat champ mapu z Data Dragon
-  seedRiotIds: ['REPLACE_ME#EUW'],// bootstrap seedy ve formátu Name#TAG
+  seeds: {                        // bootstrap účty per region (Name#TAG)
+    europe: [],
+    americas: [],
+    asia: []
+  },
   dataDragonSets: [
     'set1','set2','set3','set4','set5','set6','set6cde',
     'set7','set7b','set8','set9','set10','set11','set12'
@@ -47,33 +52,38 @@ const DEFAULT_CONFIG = {
 // Rate limiter: respektuje 30 req / 10 s a 500 req / 10 min + per-run cap
 // ---------------------------------------------------------------------------
 class RateLimiter {
-  constructor(maxRun) {
+  constructor(maxRun, windows) {
     this.maxRun = maxRun;
     this.used = 0;
-    this.win10s = [];   // časy requestů za posledních 10 s
-    this.win10m = [];   // časy requestů za posledních 10 min
+    // windows: [{ ms, max }] — sleduje časy requestů v každém okně
+    this.windows = windows.map(w => ({ ms: w.ms, max: w.max, hits: [] }));
   }
   async take() {
     if (this.used >= this.maxRun) {
       throw new Error('RUN_CAP'); // signál pro čisté ukončení běhu
     }
-    // čekej dokud se vejdeme do obou oken
     /* eslint-disable no-constant-condition */
     while (true) {
       const now = Date.now();
-      this.win10s = this.win10s.filter(t => now - t < 10_000);
-      this.win10m = this.win10m.filter(t => now - t < 600_000);
-      if (this.win10s.length < 28 && this.win10m.length < 480) break; // rezerva pod 30/500
-      const wait10s = this.win10s.length >= 28 ? 10_000 - (now - this.win10s[0]) : 0;
-      const wait10m = this.win10m.length >= 480 ? 600_000 - (now - this.win10m[0]) : 0;
-      await sleep(Math.max(250, wait10s, wait10m));
+      let wait = 0;
+      for (const w of this.windows) {
+        w.hits = w.hits.filter(t => now - t < w.ms);
+        if (w.hits.length >= w.max) wait = Math.max(wait, w.ms - (now - w.hits[0]));
+      }
+      if (wait <= 0) break;
+      await sleep(Math.max(250, wait));
     }
     const t = Date.now();
-    this.win10s.push(t); this.win10m.push(t); this.used++;
+    for (const w of this.windows) w.hits.push(t);
+    this.used++;
   }
 }
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// Když 429 vrátí Retry-After delší než tohle (= zásah hodinového per-method
+// limitu), nečekáme — ukončíme běh a uložíme progress; naváže další cron.
+const LONG_429_THRESHOLD = 90;
 
 // ---------------------------------------------------------------------------
 // HTTP helper (Riot) s retry na 429
@@ -85,6 +95,10 @@ async function riotGet(cluster, pathSeg, limiter, apiKey) {
     const res = await fetch(url, { headers: { 'X-Riot-Token': apiKey } });
     if (res.status === 429) {
       const retry = parseInt(res.headers.get('retry-after') || '10', 10);
+      if (retry > LONG_429_THRESHOLD) {
+        console.warn(`[429] ${pathSeg} -> Retry-After ${retry}s (hodinový limit) — končím běh, naváže další cron`);
+        throw new Error('RATE_HALT');
+      }
       console.warn(`[429] ${pathSeg} -> čekám ${retry}s`);
       await sleep((retry + 1) * 1000);
       continue;
@@ -251,9 +265,11 @@ function dayKey(iso) {
   return d.toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
 }
 
-function ensureDay(days, dk) {
-  if (!days[dk]) days[dk] = { matchups: {}, deckGames: {} };
-  return days[dk];
+function bucketFor(days, dk, region, format) {
+  days[dk] ??= {};
+  days[dk][region] ??= {};
+  days[dk][region][format] ??= { matchups: {}, deckGames: {} };
+  return days[dk][region][format];
 }
 
 function pruneDays(days, maxDays) {
@@ -278,18 +294,23 @@ async function main() {
   if (!cfg.firebaseUrl) throw new Error('Chybí firebaseUrl v config.json');
   const dbUrl = cfg.firebaseUrl.replace(/\/$/, '');
 
-  const limiter = new RateLimiter(cfg.maxRequestsPerRun);
+  const limiter = new RateLimiter(cfg.maxRequestsPerRun, [
+    { ms: 1000, max: 18 },      // app: 20 req / 1 s  (rezerva)
+    { ms: 120000, max: 95 }     // app: 100 req / 2 min (rezerva)
+  ]);
   const state = await loadState(dbUrl, fbSecret);
-  state.frontier ??= [];
-  state.visited ??= [];
+  state.regions ??= {};        // { europe:{frontier:[],visited:[]}, ... }
   state.processed ??= [];
   state.days ??= {};
   state.champMap ??= {};
   state.champFetchedAt ??= 0;
 
-  const visited = new Set(state.visited);
   const processed = new Set(state.processed);
   const gameTypeTally = {};
+  const infoSamples = [];
+  const perRegionCap = Math.max(1, Math.floor(cfg.maxRequestsPerRun / cfg.regions.length));
+  const perRegionMd = Math.max(1, Math.floor(cfg.maxMatchDetailsPerRun / cfg.regions.length));
+  let mdGlobal = 0;  // detaily zápasů stažené v tomto běhu (hlídá 100/hod limit)
 
   // Champ mapa (obnov jednou za champRefreshHours)
   const champStale = Date.now() - state.champFetchedAt > cfg.champRefreshHours * 3600_000;
@@ -310,84 +331,110 @@ async function main() {
 
   try {
     for (const cluster of cfg.regions) {
-      const acct = ACCOUNT_CLUSTER[cluster] || 'europe';
+      const acct = ACCOUNT_CLUSTER[cluster] || cluster;
+      state.regions[cluster] ??= { frontier: [], visited: [] };
+      const reg = state.regions[cluster];
+      const visited = new Set(reg.visited);
+      const startUsed = limiter.used;
 
-      // Seed do frontieru, pokud je prázdný
-      if (state.frontier.length === 0) {
-        // 1) seedRiotIds (Name#TAG) -> puuid
-        for (const rid of cfg.seedRiotIds) {
-          if (!rid.includes('#') || rid.startsWith('REPLACE_ME')) continue;
+      // Seed do fronty regionu, pokud je prázdná
+      if (reg.frontier.length === 0) {
+        const seeds = (cfg.seeds && cfg.seeds[cluster]) || [];
+        for (const rid of seeds) {
+          if (!rid.includes('#')) continue;
           const [name, tag] = rid.split('#');
           const a = await riotGet(acct,
             `/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`,
             limiter, apiKey);
-          if (a?.puuid && !visited.has(a.puuid)) state.frontier.push(a.puuid);
+          if (a?.puuid && !visited.has(a.puuid)) reg.frontier.push(a.puuid);
+          else if (!a) console.warn(`[${cluster}] seed neresolvnut: ${rid}`);
         }
-        // 2) Masters leaderboard (názvy bez tagu nejdou resolvnout, ale logni počet)
-        const lb = await riotGet(cluster, '/lor/ranked/v1/leaderboards', limiter, apiKey);
-        const count = lb?.players?.length ?? 0;
-        console.log(`[${cluster}] Masters leaderboard: ${count} hráčů (seed jede přes seedRiotIds + snowball)`);
+        console.log(`[${cluster}] seed -> frontier ${reg.frontier.length}`);
       }
 
-      // Crawl
-      while (state.frontier.length > 0) {
-        const puuid = state.frontier.shift();
-        if (visited.has(puuid)) continue;
+      // Crawl — primárně limitované rozpočtem detailů zápasů (100/hod strop)
+      let regionMd = 0;
+      while (reg.frontier.length > 0 && regionMd < perRegionMd
+             && mdGlobal < cfg.maxMatchDetailsPerRun
+             && (limiter.used - startUsed) < perRegionCap) {
+
+        const puuid = reg.frontier[0];           // peek (shift až po dokončení)
+        if (visited.has(puuid)) { reg.frontier.shift(); continue; }
 
         const ids = await riotGet(cluster,
           `/lor/match/v1/matches/by-puuid/${puuid}/ids`, limiter, apiKey);
-        visited.add(puuid);
-        if (!Array.isArray(ids)) continue;
 
-        for (const matchId of ids.slice(0, cfg.maxMatchesPerPuuid)) {
-          if (processed.has(matchId)) continue;
-          const m = await riotGet(cluster, `/lor/match/v1/matches/${matchId}`, limiter, apiKey);
-          processed.add(matchId);
-          if (!m?.info) continue;
+        let stoppedEarly = false;
+        if (Array.isArray(ids)) {
+          for (const matchId of ids.slice(0, cfg.maxMatchesPerPuuid)) {
+            if (processed.has(matchId)) continue;
+            if (regionMd >= perRegionMd || mdGlobal >= cfg.maxMatchDetailsPerRun) {
+              stoppedEarly = true; break;        // nech puuid ve frontě pro další běh
+            }
+            const m = await riotGet(cluster, `/lor/match/v1/matches/${matchId}`, limiter, apiKey);
+            processed.add(matchId); regionMd++; mdGlobal++;
+            if (!m?.info) continue;
 
-          const gt = m.info.game_type || m.info.type || 'unknown';
-          gameTypeTally[gt] = (gameTypeTally[gt] || 0) + 1;
-          if (!cfg.gameTypeAllow.includes(gt)) continue;
+            const gt = m.info.game_type || m.info.type || 'unknown';
+            const gm = m.info.game_mode || '?';
+            const gf = m.info.game_format || m.info.format || '?';
+            const tallyKey = `${gm} / ${gt} / ${gf}`;
+            gameTypeTally[tallyKey] = (gameTypeTally[tallyKey] || 0) + 1;
+            if (infoSamples.length < 3) {
+              const { players: _p, ...rest } = m.info;
+              infoSamples.push(rest);
+            }
+            if (!cfg.gameTypeAllow.includes(gt)) continue;
 
-          const dk = dayKey(m.info.game_start_time_utc);
-          if (!dk) continue;
-          const cutoff = new Date(Date.now() - cfg.maxWindowDays * 86400_000).toISOString().slice(0, 10);
-          if (dk < cutoff) continue;
+            const dk = dayKey(m.info.game_start_time_utc);
+            if (!dk) continue;
+            const cutoff = new Date(Date.now() - cfg.maxWindowDays * 86400_000).toISOString().slice(0, 10);
+            if (dk < cutoff) continue;
 
-          const players = m.info.players || [];
-          if (players.length !== 2) continue;
+            const players = m.info.players || [];
+            if (players.length !== 2) continue;
 
-          // přidej soupeře do frontieru pro snowball
-          for (const p of (m.metadata?.participants || [])) {
-            if (!visited.has(p) && state.frontier.length < cfg.maxFrontier) state.frontier.push(p);
-          }
+            // snowball: soupeři do fronty TOHOTO regionu
+            for (const p of (m.metadata?.participants || [])) {
+              if (!visited.has(p) && reg.frontier.length < cfg.maxFrontier) reg.frontier.push(p);
+            }
 
-          const [pa, pb] = players;
-          const la = buildLabel(pa.deck_code, pa.factions, champMap);
-          const lb2 = buildLabel(pb.deck_code, pb.factions, champMap);
-          const aWon = pa.game_outcome === 'win';
+            const [pa, pb] = players;
+            const la = buildLabel(pa.deck_code, pa.factions, champMap);
+            const lb2 = buildLabel(pb.deck_code, pb.factions, champMap);
+            const aWon = pa.game_outcome === 'win';
 
-          const bucket = ensureDay(state.days, dk);
-          // overall deck games/wins
-          for (const [lab, won] of [[la, aWon], [lb2, !aWon]]) {
-            bucket.deckGames[lab] ??= { games: 0, wins: 0 };
-            bucket.deckGames[lab].games++;
-            if (won) bucket.deckGames[lab].wins++;
-          }
-          // directed matchup: key "A@@B" = deck A vs deck B, wins pro A
-          if (la !== lb2) {
-            const kAB = `${la}@@${lb2}`, kBA = `${lb2}@@${la}`;
-            bucket.matchups[kAB] ??= { games: 0, wins: 0 };
-            bucket.matchups[kBA] ??= { games: 0, wins: 0 };
-            bucket.matchups[kAB].games++; if (aWon) bucket.matchups[kAB].wins++;
-            bucket.matchups[kBA].games++; if (!aWon) bucket.matchups[kBA].wins++;
+            // formát: zatím SUROVÁ hodnota z API; po prvním běhu podle logu
+            // [info SAMPLE] potvrdíme správné pole a mapování Standard/Eternal.
+            const fmt = String(m.info.game_format ?? m.info.format ?? 'unknown');
+            const bucket = bucketFor(state.days, dk, cluster, fmt);
+
+            for (const [lab, won] of [[la, aWon], [lb2, !aWon]]) {
+              bucket.deckGames[lab] ??= { games: 0, wins: 0 };
+              bucket.deckGames[lab].games++;
+              if (won) bucket.deckGames[lab].wins++;
+            }
+            if (la !== lb2) {
+              const kAB = `${la}@@${lb2}`, kBA = `${lb2}@@${la}`;
+              bucket.matchups[kAB] ??= { games: 0, wins: 0 };
+              bucket.matchups[kBA] ??= { games: 0, wins: 0 };
+              bucket.matchups[kAB].games++; if (aWon) bucket.matchups[kAB].wins++;
+              bucket.matchups[kBA].games++; if (!aWon) bucket.matchups[kBA].wins++;
+            }
           }
         }
+
+        if (stoppedEarly) break;     // rozpočet vyčerpán uprostřed hráče -> necháme ho ve frontě
+        reg.frontier.shift();        // hráč hotový -> ven z fronty
+        visited.add(puuid);
       }
+      console.log(`[${cluster}] detaily zápasů: ${regionMd}, frontier: ${reg.frontier.length}`);
+
+      reg.visited = [...visited].slice(-100000);
     }
   } catch (e) {
-    if (e.message === 'RUN_CAP') {
-      console.log(`[cap] dosažen strop ${cfg.maxRequestsPerRun} req/běh — ukládám progress`);
+    if (e.message === 'RUN_CAP' || e.message === 'RATE_HALT') {
+      console.log(`[stop] ${e.message} — ukládám progress, naváže další cron`);
     } else {
       console.error('[chyba]', e);
     }
@@ -395,7 +442,6 @@ async function main() {
 
   // Prune + persist
   pruneDays(state.days, cfg.maxWindowDays);
-  state.visited = [...visited].slice(-200000);
   state.processed = [...processed].slice(-cfg.maxProcessedIds);
 
   await saveState(dbUrl, fbSecret, state);
@@ -404,6 +450,7 @@ async function main() {
   const stats = {
     generatedAt: new Date().toISOString(),
     patchStart: cfg.patchStart,
+    regions: cfg.regions,
     windows: [
       { key: '2d', label: 'Poslední 2 dny', days: 2 },
       { key: '7d', label: 'Týden', days: 7 },
@@ -415,8 +462,10 @@ async function main() {
   await fs.mkdir(path.dirname(STATS_PATH), { recursive: true });
   await fs.writeFile(STATS_PATH, JSON.stringify(stats));
 
-  console.log(`[hotovo] requestů: ${limiter.used}, dnů v bucketu: ${Object.keys(state.days).length}, frontier: ${state.frontier.length}`);
-  console.log('[game_type DISTINCT]', JSON.stringify(gameTypeTally));
+  const frontiers = Object.fromEntries(cfg.regions.map(r => [r, state.regions[r]?.frontier?.length ?? 0]));
+  console.log(`[hotovo] requestů: ${limiter.used}, dnů v bucketu: ${Object.keys(state.days).length}, frontiers: ${JSON.stringify(frontiers)}`);
+  console.log('[mode/type/format DISTINCT]', JSON.stringify(gameTypeTally));
+  console.log('[info SAMPLE]', JSON.stringify(infoSamples));
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
