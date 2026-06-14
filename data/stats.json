@@ -1,0 +1,1 @@
+{"generatedAt":"2026-06-14T20:26:26.217Z","patchStart":"2026-06-03","regions":["europe","americas","asia"],"windows":[{"key":"2d","label":"Poslední 2 dny","days":2},{"key":"7d","label":"Týden","days":7},{"key":"14d","label":"14 dní","days":14},{"key":"patch","label":"Od patche","sincePatch":true}],"days":{}}
