@@ -3,13 +3,13 @@
   "regions": ["europe"],
   "gameTypeAllow": ["Ranked"],
   "maxWindowDays": 21,
-  "patchStart": "2026-06-01",
+  "patchStart": "2026-06-03",
   "maxRequestsPerRun": 450,
   "maxMatchesPerPuuid": 20,
   "maxFrontier": 6000,
   "maxProcessedIds": 120000,
   "champRefreshHours": 168,
-  "seedRiotIds": ["REPLACE_ME#EUW"],
+  "seedRiotIds": ["Storyteller#7X3Y"],
   "dataDragonSets": [
     "set1", "set2", "set3", "set4", "set5", "set6", "set6cde",
     "set7", "set7b", "set8", "set9", "set10", "set11", "set12"
