@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runeterra Meta — LND</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,640&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#141b27; --panel2:#1a2230; --line:#27313f;
+    --ink:#e9edf4; --muted:#94a1b5; --faint:#5f6c7e;
+    --gold:#e3b25a; --teal:#49c7b1;
+    --good:#46b88a; --bad:#e0575c; --mid:#586374;
+    --r-DE:#e8c25a; --r-FR:#6fd0e8; --r-IO:#ef7fae; --r-NX:#e0524e; --r-PZ:#f0973f;
+    --r-SI:#38c39a; --r-BW:#e06a3a; --r-SH:#d9b84a; --r-MT:#9b7fe0; --r-BC:#7fce5a; --r-RU:#9aa6b8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:
+    radial-gradient(1100px 500px at 78% -10%, rgba(227,178,90,.07), transparent 60%),
+    radial-gradient(900px 480px at 8% 0%, rgba(73,199,177,.06), transparent 55%), var(--bg);
+    min-height:100vh}
+  .wrap{max-width:1120px;margin:0 auto;padding:34px 22px 90px}
+
+  /* header */
+  .eyebrow{font:600 11px/1 "Spline Sans Mono",monospace;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  h1{font-family:Fraunces,serif;font-weight:560;font-size:clamp(34px,6vw,58px);
+    line-height:.98;margin:0;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--teal)}
+  .sub{margin:14px 0 0;color:var(--muted);font-size:14px;max-width:60ch}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:20px;
+    font:500 12.5px/1 "Spline Sans Mono",monospace;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:600}
+  .meta .dot{color:var(--faint)}
+
+  /* controls */
+  .controls{display:flex;flex-wrap:wrap;gap:22px;margin:30px 0 8px;
+    padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+  .ctl{display:flex;flex-direction:column;gap:8px}
+  .ctl > span{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint)}
+  .seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--muted);
+    font:500 13px/1 Inter,sans-serif;padding:8px 13px;border-radius:7px;cursor:pointer;
+    transition:background .15s,color .15s}
+  .seg button:hover{color:var(--ink)}
+  .seg button[aria-pressed="true"]{background:var(--panel2);color:var(--ink);
+    box-shadow:inset 0 0 0 1px var(--line)}
+  .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  section{margin-top:42px}
+  .head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+  .head h2{font-family:Fraunces,serif;font-weight:560;font-size:23px;margin:0;letter-spacing:-.01em}
+  .head .note{font:500 12px/1.4 "Spline Sans Mono",monospace;color:var(--faint)}
+
+  /* region chips */
+  .chips{display:inline-flex;gap:4px;vertical-align:middle}
+  .chip{display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:16px;border-radius:4px;font:600 9px/1 "Spline Sans Mono",monospace;
+    color:#0b0f17}
+
+  /* tier list */
+  .tier{display:flex;gap:14px;padding:13px 0;border-top:1px solid var(--line)}
+  .tier:first-child{border-top:0}
+  .tier .badge{flex:0 0 44px;height:44px;border-radius:10px;display:grid;place-items:center;
+    font-family:Fraunces,serif;font-weight:640;font-size:21px;color:#0b0f17}
+  .tier .body{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0}
+  .deckrow{display:flex;align-items:center;gap:11px}
+  .deckrow .name{flex:1;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .deckrow .nums{display:flex;gap:14px;font:500 12.5px/1 "Spline Sans Mono",monospace;flex:0 0 auto}
+  .deckrow .wr{width:46px;text-align:right}
+  .deckrow .pr{width:64px;text-align:right;color:var(--muted)}
+  .deckrow .gm{width:56px;text-align:right;color:var(--faint)}
+  .bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:1px}
+  .bar > i{display:block;height:100%;background:var(--teal)}
+
+  /* matrix */
+  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+  table.mx{border-collapse:collapse;font:500 12px/1 "Spline Sans Mono",monospace}
+  table.mx th,table.mx td{padding:0;text-align:center}
+  table.mx thead th{position:sticky;top:0;background:var(--panel);color:var(--muted);
+    font-weight:500;height:120px;vertical-align:bottom}
+  table.mx thead th .v{writing-mode:vertical-rl;transform:rotate(180deg);
+    padding:9px 0;max-height:108px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+  table.mx tbody th{text-align:left;white-space:nowrap;padding:0 14px 0 16px;color:var(--ink);
+    font-weight:500;font-size:12px;background:var(--panel)}
+  table.mx td{width:42px;height:38px;border-left:1px solid rgba(39,49,63,.5);
+    border-top:1px solid rgba(39,49,63,.5);color:#0b0f17;font-weight:600}
+  table.mx td.diag{background:repeating-linear-gradient(45deg,#1a2230,#1a2230 4px,#171e2a 4px,#171e2a 8px);color:var(--faint)}
+  table.mx td.empty{color:var(--faint);background:var(--panel2)}
+  table.mx tbody tr:hover th{color:var(--gold)}
+
+  /* table */
+  table.list{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.list th{text-align:left;font:600 10.5px/1 "Spline Sans Mono",monospace;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:0 12px 12px;border-bottom:1px solid var(--line)}
+  table.list th.num,table.list td.num{text-align:right;font-family:"Spline Sans Mono",monospace}
+  table.list td{padding:11px 12px;border-bottom:1px solid rgba(39,49,63,.55)}
+  table.list tbody tr:hover{background:var(--panel)}
+  table.list .nm{display:flex;align-items:center;gap:10px}
+
+  .empty-state{padding:46px 22px;text-align:center;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:14px}
+  .empty-state b{color:var(--ink);display:block;margin-bottom:6px;font-size:15px}
+  .legend{display:flex;align-items:center;gap:8px;margin-top:14px;
+    font:500 11px/1 "Spline Sans Mono",monospace;color:var(--faint)}
+  .legend .scale{display:flex;height:9px;width:150px;border-radius:5px;overflow:hidden}
+  .legend .scale i{flex:1}
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+    color:var(--faint);font:500 12px/1.6 "Spline Sans Mono",monospace}
+  @media (max-width:560px){.controls{gap:16px}.deckrow .pr{display:none}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">LND · Storyteller Project</div>
+  <h1>Runeterra <em>Meta</em></h1>
+  <p class="sub">Live ranked deck statistics, crawled from the Riot API and grouped by champion archetype. Pick a region, a format, and a window.</p>
+  <div class="meta" id="meta"></div>
+
+  <div class="controls">
+    <div class="ctl"><span>Region</span><div class="seg" id="seg-region"></div></div>
+    <div class="ctl"><span>Format</span><div class="seg" id="seg-format"></div></div>
+    <div class="ctl"><span>Window</span><div class="seg" id="seg-window"></div></div>
+  </div>
+
+  <div id="content"></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const REGION_LABEL = { europe:'EU', americas:'NA', asia:'APAC' };
+const REGION_NAME = { DE:'Demacia',FR:'Freljord',IO:'Ionia',NX:'Noxus',PZ:'Piltover & Zaun',
+  SI:'Shadow Isles',BW:'Bilgewater',SH:'Shurima',MT:'Mount Targon',BC:'Bandle City',RU:'Runeterra' };
+const FACTION_REF = {FACTION_DEMACIA_NAME:'DE',FACTION_FRELJORD_NAME:'FR',FACTION_IONIA_NAME:'IO',
+  FACTION_NOXUS_NAME:'NX',FACTION_PILTOVER_NAME:'PZ',FACTION_SHADOWISLES_NAME:'SI',
+  FACTION_BILGEWATER_NAME:'BW',FACTION_SHURIMA_NAME:'SH',FACTION_MTTARGON_NAME:'MT',FACTION_BANDLECITY_NAME:'BC'};
+const regionCode = f => FACTION_REF[f] || (/^[A-Z]{2}$/.test(f) ? f : 'RU');
+
+// kanonizace labelu — sloučí staré ref-based i nové code-based
+function normalizeLabel(label){
+  const m = String(label).match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+  if(!m) return label;
+  const regions = [...new Set(m[2].split('/').map(s=>regionCode(s.trim())))].sort();
+  return `${m[1].trim()} (${regions.join('/')})`;
+}
+function regionsOf(label){
+  const m = String(label).match(/\(([^)]*)\)\s*$/);
+  return m ? m[1].split('/') : [];
+}
+
+const MIN_GAMES = 3;          // práh pro tier list
+const state = { region:'all', format:'all', window:14 };
+let STATS = null;
+
+const todayKey = () => new Date().toISOString().slice(0,10);
+
+function aggregate(){
+  const days = STATS.days || {};
+  const cutoff = state.window
+    ? new Date(Date.now()-(state.window-1)*864e5).toISOString().slice(0,10)
+    : STATS.patchStart;
+  const today = todayKey();
+  const deck = {}, mu = {};
+  for(const [d, regs] of Object.entries(days)){
+    if(d < cutoff || d > today) continue;
+    for(const [reg, fmts] of Object.entries(regs)){
+      if(state.region !== 'all' && reg !== state.region) continue;
+      for(const [fmt, b] of Object.entries(fmts)){
+        if(state.format !== 'all' && fmt !== state.format) continue;
+        for(const [k,v] of Object.entries(b.deckGames||{})){
+          const n = normalizeLabel(k);
+          (deck[n] ??= {games:0,wins:0}); deck[n].games+=v.games; deck[n].wins+=v.wins;
+        }
+        for(const [k,v] of Object.entries(b.matchups||{})){
+          const i = k.indexOf('@@'); if(i<0) continue;
+          const nk = normalizeLabel(k.slice(0,i))+'@@'+normalizeLabel(k.slice(i+2));
+          (mu[nk] ??= {games:0,wins:0}); mu[nk].games+=v.games; mu[nk].wins+=v.wins;
+        }
+      }
+    }
+  }
+  return {deck, mu};
+}
+
+// ---- render helpers ----
+function wrColor(wr){ // 0..1 -> barva
+  if(wr==null) return 'var(--mid)';
+  const t = Math.max(0,Math.min(1,(wr-0.35)/0.30));
+  const bad=[224,87,92], good=[70,184,138];
+  const c = bad.map((b,i)=>Math.round(b+(good[i]-b)*t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function chips(label){
+  return `<span class="chips">`+regionsOf(label).map(r=>
+    `<span class="chip" style="background:var(--r-${r},#9aa6b8)" title="${REGION_NAME[r]||r}">${r}</span>`).join('')+`</span>`;
+}
+function deckName(label){ return label.replace(/\s*\([^)]*\)\s*$/,''); }
+
+function render(){
+  const {deck, mu} = aggregate();
+  const decks = Object.entries(deck).map(([label,v])=>({
+    label, games:v.games, wins:v.wins, wr:v.games?v.wins/v.games:0
+  }));
+  const total = decks.reduce((a,d)=>a+d.games,0);
+  decks.forEach(d=>d.play = total?d.games/total:0);
+
+  const root = document.getElementById('content');
+  if(total === 0){
+    root.innerHTML = `<div class="empty-state"><b>No games here yet</b>
+      Nothing collected for this region/format/window combination. ${
+        state.region!=='all' ? 'This region may still be filling up.' : 'Try a wider window.'}</div>`;
+    return;
+  }
+
+  // ---------- TIER LIST (by winrate, min sample) ----------
+  const ranked = decks.filter(d=>d.games>=MIN_GAMES).sort((a,b)=>b.wr-a.wr || b.games-a.games);
+  const low = decks.filter(d=>d.games<MIN_GAMES).sort((a,b)=>b.games-a.games);
+  const TIERS = [
+    {k:'S',min:.60,c:'var(--r-DE)'},{k:'A',min:.535,c:'var(--good)'},
+    {k:'B',min:.465,c:'var(--teal)'},{k:'C',min:.40,c:'var(--r-PZ)'},{k:'D',min:0,c:'var(--bad)'}
+  ];
+  const maxPlay = Math.max(...decks.map(d=>d.play),0.0001);
+  let tierHtml = '';
+  for(const t of TIERS){
+    const group = ranked.filter(d=>d.wr>=t.min && (TIERS.indexOf(t)===0 || d.wr<TIERS[TIERS.indexOf(t)-1].min));
+    if(!group.length) continue;
+    tierHtml += `<div class="tier"><div class="badge" style="background:${t.c}">${t.k}</div><div class="body">`+
+      group.map(d=>`<div class="deckrow">${chips(d.label)}
+        <span class="name" title="${d.label}">${deckName(d.label)}</span>
+        <span class="nums">
+          <span class="wr" style="color:${wrColor(d.wr)}">${(d.wr*100).toFixed(0)}%</span>
+          <span class="pr">${(d.play*100).toFixed(1)}% play</span>
+          <span class="gm">${d.games} gm</span>
+        </span></div>
+        <div class="bar"><i style="width:${(d.play/maxPlay*100).toFixed(1)}%"></i></div>`).join('')+
+      `</div></div>`;
+  }
+
+  // ---------- MATCHUP MATRIX (top by games) ----------
+  const top = decks.filter(d=>d.games>=MIN_GAMES).sort((a,b)=>b.games-a.games).slice(0,10);
+  let mxHtml;
+  if(top.length<2){
+    mxHtml = `<div class="empty-state">Not enough decks with ${MIN_GAMES}+ games yet to build a matrix.</div>`;
+  } else {
+    const cell = (r,c)=>{
+      if(r.label===c.label) return `<td class="diag">—</td>`;
+      const e = mu[`${r.label}@@${c.label}`];
+      if(!e || !e.games) return `<td class="empty">·</td>`;
+      const wr = e.wins/e.games;
+      return `<td style="background:${wrColor(wr)}" title="${deckName(r.label)} vs ${deckName(c.label)} — ${e.wins}/${e.games}">${(wr*100).toFixed(0)}</td>`;
+    };
+    mxHtml = `<div class="scroll"><table class="mx"><thead><tr><th></th>`+
+      top.map(c=>`<th><div class="v" title="${c.label}">${deckName(c.label)}</div></th>`).join('')+
+      `</tr></thead><tbody>`+
+      top.map(r=>`<tr><th title="${r.label}">${deckName(r.label)}</th>`+
+        top.map(c=>cell(r,c)).join('')+`</tr>`).join('')+
+      `</tbody></table></div>
+      <div class="legend"><span>Unfavored</span>
+        <span class="scale"><i style="background:${wrColor(.35)}"></i><i style="background:${wrColor(.5)}"></i><i style="background:${wrColor(.65)}"></i></span>
+        <span>Favored · numbers are row's win% vs column</span></div>`;
+  }
+
+  // ---------- DECK TABLE ----------
+  const tbl = `<div class="scroll"><table class="list"><thead><tr>
+      <th>Archetype</th><th class="num">Win %</th><th class="num">Play %</th><th class="num">Games</th>
+    </tr></thead><tbody>`+
+    decks.sort((a,b)=>b.games-a.games).map(d=>`<tr>
+      <td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td>
+      <td class="num" style="color:${d.games>=MIN_GAMES?wrColor(d.wr):'var(--faint)'}">${(d.wr*100).toFixed(0)}%</td>
+      <td class="num">${(d.play*100).toFixed(1)}%</td>
+      <td class="num" style="color:var(--muted)">${d.games}</td></tr>`).join('')+
+    `</tbody></table></div>`;
+
+  root.innerHTML = `
+    <section><div class="head"><h2>Tier list</h2>
+      <span class="note">by win rate · ${MIN_GAMES}+ games</span></div>${tierHtml||'<div class="empty-state">No decks above the sample threshold yet.</div>'}
+      ${low.length?`<div class="head" style="margin-top:24px"><h2 style="font-size:16px;color:var(--muted)">Low sample</h2>
+        <span class="note">under ${MIN_GAMES} games — not ranked</span></div>
+        <div class="tier" style="border:0;padding-top:4px"><div class="body">${
+          low.map(d=>`<div class="deckrow">${chips(d.label)}<span class="name">${deckName(d.label)}</span>
+          <span class="nums"><span class="gm">${d.games} gm</span></span></div>`).join('')}</div></div>`:''}
+    </section>
+    <section><div class="head"><h2>Matchup matrix</h2>
+      <span class="note">top ${Math.min(10,top.length)} by play</span></div>${mxHtml}</section>
+    <section><div class="head"><h2>All decks</h2>
+      <span class="note">${decks.length} archetypes · ${total} deck appearances</span></div>${tbl}</section>`;
+}
+
+function buildSeg(id, opts, key){
+  const el = document.getElementById(id);
+  el.innerHTML = opts.map(o=>`<button data-v="${o.v}" aria-pressed="${state[key]==o.v}">${o.t}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    let v = b.dataset.v;
+    if(key==='window') v = v==='patch'?null:Number(v);
+    state[key]=v;
+    el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', x===b));
+    render();
+  });
+}
+
+function init(){
+  // meta line
+  const days = Object.keys(STATS.days||{});
+  let totalGames = 0;
+  for(const d of days) for(const r of Object.values(STATS.days[d])) for(const f of Object.values(r))
+    totalGames += Object.values(f.deckGames||{}).reduce((a,b)=>a+b.games,0);
+  const upd = STATS.generatedAt ? new Date(STATS.generatedAt) : null;
+  document.getElementById('meta').innerHTML =
+    `<span>Patch <b>${STATS.patchStart||'—'}</b></span><span class="dot">/</span>
+     <span><b>${Math.round(totalGames/2)}</b> matches</span><span class="dot">/</span>
+     <span>updated <b>${upd?upd.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</b></span>`;
+
+  const regions = STATS.regions || ['europe','americas','asia'];
+  buildSeg('seg-region', [{v:'all',t:'All'}, ...regions.map(r=>({v:r,t:REGION_LABEL[r]||r}))], 'region');
+  buildSeg('seg-format', [{v:'all',t:'All'},{v:'standard',t:'Standard'},{v:'eternal',t:'Eternal'}], 'format');
+  buildSeg('seg-window', [{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}], 'window');
+
+  document.getElementById('foot').textContent =
+    'Data crawled from the Riot LoR API · archetypes grouped by champions + regions · sample sizes are small early on, so read win rates with the game count in mind.';
+  render();
+}
+
+fetch('./data/stats.json', {cache:'no-store'})
+  .then(r=>r.json())
+  .then(d=>{ STATS=d; init(); })
+  .catch(e=>{ document.getElementById('content').innerHTML =
+    `<div class="empty-state"><b>Couldn't load stats.json</b>${e}</div>`; });
+</script>
+</body>
+</html>

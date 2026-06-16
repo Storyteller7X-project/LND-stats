@@ -169,9 +169,25 @@ function decodeDeck(code) {
 
 // ---------------------------------------------------------------------------
 // Archetype label:  "Champ/champ (Region/region)" abecedně
+// Pozn.: pole `factions` z API vrací reference (FACTION_DEMACIA_NAME, ...),
+// ne dvoupísmenné kódy. Runeterra-championi mají vlastní FACTION_<champ>_NAME
+// (i card-refs CARD_..RU..) -> region RU.
 // ---------------------------------------------------------------------------
+const FACTION_REF = {
+  FACTION_DEMACIA_NAME: 'DE', FACTION_FRELJORD_NAME: 'FR', FACTION_IONIA_NAME: 'IO',
+  FACTION_NOXUS_NAME: 'NX', FACTION_PILTOVER_NAME: 'PZ', FACTION_SHADOWISLES_NAME: 'SI',
+  FACTION_BILGEWATER_NAME: 'BW', FACTION_SHURIMA_NAME: 'SH', FACTION_MTTARGON_NAME: 'MT',
+  FACTION_BANDLECITY_NAME: 'BC'
+};
+function regionCode(f) {
+  const s = String(f);
+  if (FACTION_REF[s]) return FACTION_REF[s];
+  if (/^[A-Z]{2}$/.test(s)) return s;   // už čistý kód
+  return 'RU';                          // Runeterra championi / card-refs
+}
+
 function buildLabel(deckCode, factions, champMap) {
-  const regions = [...new Set((factions || []).map(f => String(f).toUpperCase()))].sort();
+  const regions = [...new Set((factions || []).map(regionCode))].sort();
   const champs = [...new Set(
     decodeDeck(deckCode).map(code => champMap[code]).filter(Boolean)
   )].sort();
