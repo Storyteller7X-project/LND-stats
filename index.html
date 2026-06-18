@@ -17,59 +17,47 @@
     --r-SI:#38c39a; --r-BW:#e06a3a; --r-SH:#d9b84a; --r-MT:#9b7fe0; --r-BC:#7fce5a; --r-RU:#9aa6b8;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  body{background:
-    radial-gradient(1100px 500px at 78% -10%, rgba(227,178,90,.07), transparent 60%),
-    radial-gradient(900px 480px at 8% 0%, rgba(73,199,177,.06), transparent 55%), var(--bg);
-    min-height:100vh}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:radial-gradient(1100px 500px at 78% -10%, rgba(227,178,90,.07), transparent 60%),radial-gradient(900px 480px at 8% 0%, rgba(73,199,177,.06), transparent 55%), var(--bg);min-height:100vh}
   .wrap{max-width:1180px;margin:0 auto;padding:34px 22px 90px}
-
-  .eyebrow{font:600 11px/1 "Spline Sans Mono",monospace;letter-spacing:.28em;
-    text-transform:uppercase;color:var(--gold);margin-bottom:14px}
-  h1{font-family:Fraunces,serif;font-weight:560;font-size:clamp(34px,6vw,58px);
-    line-height:.98;margin:0;letter-spacing:-.01em}
+  .eyebrow{font:600 11px/1 "Spline Sans Mono",monospace;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  h1{font-family:Fraunces,serif;font-weight:560;font-size:clamp(34px,6vw,58px);line-height:.98;margin:0;letter-spacing:-.01em}
   h1 em{font-style:italic;color:var(--teal)}
-  .sub{margin:14px 0 0;color:var(--muted);font-size:14px;max-width:62ch}
-  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:20px;
-    font:500 12.5px/1 "Spline Sans Mono",monospace;color:var(--muted)}
-  .meta b{color:var(--ink);font-weight:600}
-  .meta .dot{color:var(--faint)}
+  .sub{margin:14px 0 0;color:var(--muted);font-size:14px;max-width:64ch}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:20px;font:500 12.5px/1 "Spline Sans Mono",monospace;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:600}.meta .dot{color:var(--faint)}
 
-  .controls{display:flex;flex-wrap:wrap;gap:22px;margin:30px 0 8px;
-    padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+  .controls{display:flex;flex-wrap:wrap;gap:22px;margin:30px 0 8px;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
   .ctl{display:flex;flex-direction:column;gap:8px}
-  .ctl > span{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--faint)}
+  .ctl > span{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
   .seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
-  .seg button{appearance:none;border:0;background:transparent;color:var(--muted);
-    font:500 13px/1 Inter,sans-serif;padding:8px 13px;border-radius:7px;cursor:pointer;
-    transition:background .15s,color .15s}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:500 13px/1 Inter,sans-serif;padding:8px 13px;border-radius:7px;cursor:pointer;transition:background .15s,color .15s}
   .seg button:hover{color:var(--ink)}
-  .seg button[aria-pressed="true"]{background:var(--panel2);color:var(--ink);
-    box-shadow:inset 0 0 0 1px var(--line)}
+  .seg button[aria-pressed="true"]{background:var(--panel2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
   .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-  section{margin-top:42px}
+  .viewbar{display:flex;align-items:center;gap:16px;margin-top:30px;flex-wrap:wrap}
+  .tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
+  .tabs button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:Fraunces,serif;font-weight:560;font-size:16px;padding:9px 18px;border-radius:8px;cursor:pointer}
+  .tabs button[aria-pressed="true"]{background:var(--gold);color:#0b0f17}
+  .tabs button:not([aria-pressed="true"]):hover{color:var(--ink)}
+  .smooth{display:flex;align-items:center;gap:10px;margin-left:auto;font:500 11.5px/1 "Spline Sans Mono",monospace;color:var(--faint)}
+  .smooth .seg button{padding:7px 11px;font-size:12px}
+
+  section{margin-top:34px}
   .head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px;flex-wrap:wrap}
-  .head h2{font-family:Fraunces,serif;font-weight:560;font-size:23px;margin:0;letter-spacing:-.01em}
+  .head h2{font-family:Fraunces,serif;font-weight:560;font-size:22px;margin:0;letter-spacing:-.01em}
   .head .note{font:500 12px/1.4 "Spline Sans Mono",monospace;color:var(--faint)}
   .head .spacer{flex:1}
-  .linkbtn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);
-    font:500 12px/1 "Spline Sans Mono",monospace;padding:8px 12px;border-radius:8px;cursor:pointer}
+  .linkbtn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:500 12px/1 "Spline Sans Mono",monospace;padding:8px 12px;border-radius:8px;cursor:pointer}
   .linkbtn:hover{color:var(--ink);border-color:var(--gold)}
 
   .chips{display:inline-flex;gap:4px;vertical-align:middle}
-  .chip{display:inline-flex;align-items:center;justify-content:center;
-    width:22px;height:16px;border-radius:4px;font:600 9px/1 "Spline Sans Mono",monospace;
-    color:#0b0f17}
+  .chip{display:inline-flex;align-items:center;justify-content:center;width:22px;height:16px;border-radius:4px;font:600 9px/1 "Spline Sans Mono",monospace;color:#0b0f17}
 
-  /* meta table */
   .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
   table.list{width:100%;border-collapse:collapse;font-size:13.5px}
-  table.list th{text-align:left;font:600 10.5px/1 "Spline Sans Mono",monospace;
-    letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:14px 12px;
-    border-bottom:1px solid var(--line);white-space:nowrap}
+  table.list th{text-align:left;font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:14px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
   table.list th.num,table.list td.num{text-align:right;font-family:"Spline Sans Mono",monospace}
   table.list th.sortable{cursor:pointer;user-select:none}
   table.list th.sortable:hover{color:var(--muted)}
@@ -83,57 +71,62 @@
   .pbar{height:3px;border-radius:2px;background:var(--line);margin-top:5px;overflow:hidden;width:90px}
   .pbar>i{display:block;height:100%;background:var(--teal)}
 
-  /* matrix */
   table.mx{border-collapse:collapse;font:500 12px/1 "Spline Sans Mono",monospace}
   table.mx th,table.mx td{padding:0;text-align:center}
-  table.mx thead th{position:sticky;top:0;background:var(--panel);color:var(--muted);
-    font-weight:500;height:128px;vertical-align:bottom;z-index:1}
-  table.mx thead th .v{writing-mode:vertical-rl;transform:rotate(180deg);
-    padding:9px 0;max-height:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;cursor:pointer}
-  table.mx thead th.lead{writing-mode:horizontal-tb;font-size:10px;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--faint);height:128px;vertical-align:bottom;padding-bottom:11px}
-  table.mx tbody th{text-align:left;white-space:nowrap;padding:0 12px 0 16px;color:var(--ink);
-    font-weight:500;font-size:12px;background:var(--panel);cursor:pointer}
+  table.mx thead th{position:sticky;top:0;background:var(--panel);color:var(--muted);font-weight:500;height:128px;vertical-align:bottom;z-index:1}
+  table.mx thead th .v{writing-mode:vertical-rl;transform:rotate(180deg);padding:9px 0;max-height:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;cursor:pointer}
+  table.mx thead th.lead{writing-mode:horizontal-tb;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);height:128px;vertical-align:bottom;padding-bottom:11px}
+  table.mx tbody th{text-align:left;white-space:nowrap;padding:0 12px 0 16px;color:var(--ink);font-weight:500;font-size:12px;background:var(--panel);cursor:pointer}
   table.mx tbody th:hover{color:var(--gold)}
-  table.mx td{width:40px;height:38px;border-left:1px solid rgba(39,49,63,.5);
-    border-top:1px solid rgba(39,49,63,.5);color:#0b0f17;font-weight:600}
+  table.mx td{width:40px;height:38px;border-left:1px solid rgba(39,49,63,.5);border-top:1px solid rgba(39,49,63,.5);color:#0b0f17;font-weight:600}
   table.mx td.lead{background:var(--panel2);color:var(--ink);font-weight:500;width:52px}
   table.mx td.diag{background:repeating-linear-gradient(45deg,#1a2230,#1a2230 4px,#171e2a 4px,#171e2a 8px);color:var(--faint)}
   table.mx td.empty{color:var(--faint);background:var(--panel2)}
-  table.mx td.low{opacity:.45}
-  table.mx tbody tr:hover th{color:var(--gold)}
-  .legend{display:flex;align-items:center;gap:8px;margin-top:14px;
-    font:500 11px/1 "Spline Sans Mono",monospace;color:var(--faint)}
-  .legend .scale{display:flex;height:9px;width:150px;border-radius:5px;overflow:hidden}
-  .legend .scale i{flex:1}
+  table.mx td.low{opacity:.5}
+  .legend{display:flex;align-items:center;gap:8px;margin-top:14px;font:500 11px/1 "Spline Sans Mono",monospace;color:var(--faint)}
+  .legend .scale{display:flex;height:9px;width:150px;border-radius:5px;overflow:hidden}.legend .scale i{flex:1}
 
-  /* deck detail */
-  .detail{border:1px solid var(--gold);border-radius:16px;background:var(--panel);
-    padding:22px;margin-top:8px;animation:fade .25s ease}
+  /* counter explorer (deck detail) */
+  .detail{border:1px solid var(--gold);border-radius:16px;background:var(--panel);padding:22px;margin-bottom:26px;animation:fade .25s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .detail .dhead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
   .detail .dtitle{font-family:Fraunces,serif;font-weight:560;font-size:22px;display:flex;align-items:center;gap:10px}
-  .detail .close{margin-left:auto;appearance:none;border:1px solid var(--line);background:transparent;
-    color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px}
+  .detail .close{margin-left:auto;appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px}
   .detail .close:hover{color:var(--ink);border-color:var(--gold)}
-  .detail .stat{display:flex;gap:24px;margin:14px 0 4px;flex-wrap:wrap;
-    font:500 13px/1.3 "Spline Sans Mono",monospace}
+  .detail .stat{display:flex;gap:24px;margin:14px 0 4px;flex-wrap:wrap;font:500 13px/1.3 "Spline Sans Mono",monospace}
   .detail .stat b{display:block;font-family:Fraunces,serif;font-size:20px;font-weight:640;margin-top:3px}
   .detail .stat .k{color:var(--faint);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
-  .mlist{margin-top:18px;border-top:1px solid var(--line)}
-  .mrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(39,49,63,.5)}
-  .mrow .opp{flex:1;display:flex;align-items:center;gap:9px;min-width:0;font-size:13.5px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:20px}
+  @media (max-width:680px){.cols{grid-template-columns:1fr;gap:18px}}
+  .cols h4{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.16em;text-transform:uppercase;margin:0 0 6px;color:var(--faint)}
+  .cols h4.good{color:var(--good)}.cols h4.bad{color:var(--bad)}
+  .mrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(39,49,63,.5)}
+  .mrow .opp{flex:1;display:flex;align-items:center;gap:8px;min-width:0;font-size:13px}
   .mrow .opp span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .mrow .rec{font:500 12px/1 "Spline Sans Mono",monospace;color:var(--muted);width:54px;text-align:right}
-  .mrow .wrcell{font:600 13px/1 "Spline Sans Mono",monospace;width:44px;text-align:right}
-  .mrow .ci{width:90px;text-align:right}
-  .empty-state{padding:46px 22px;text-align:center;color:var(--muted);
-    background:var(--panel);border:1px solid var(--line);border-radius:14px}
+  .mrow .pr{font:500 10.5px/1 "Spline Sans Mono",monospace;color:var(--faint);width:42px;text-align:right}
+  .mrow .rec{font:500 11px/1 "Spline Sans Mono",monospace;color:var(--muted);width:42px;text-align:right}
+  .mrow .wrcell{font:600 13px/1 "Spline Sans Mono",monospace;width:40px;text-align:right}
+
+  /* conquest */
+  .conqbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;font:500 12.5px/1.4 "Spline Sans Mono",monospace;color:var(--muted)}
+  .conqbar select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:500 12.5px/1 Inter,sans-serif}
+  .lineups{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+  .conq{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px 18px}
+  .conq.top{border-color:var(--gold)}
+  .conq .rank{font:600 11px/1 "Spline Sans Mono",monospace;color:var(--faint);letter-spacing:.1em}
+  .conq .cov{font-family:Fraunces,serif;font-weight:640;font-size:30px;line-height:1;margin:6px 0 2px}
+  .conq .covk{font:500 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .conq .decks{margin:14px 0 4px;display:flex;flex-direction:column;gap:8px}
+  .conq .d{display:flex;align-items:center;gap:9px;font-size:13.5px;cursor:pointer}
+  .conq .d:hover span{color:var(--gold)}
+  .conq .d .lp{margin-left:auto;font:500 9px/1 "Spline Sans Mono",monospace;letter-spacing:.08em;color:var(--bad);border:1px solid var(--bad);border-radius:5px;padding:3px 5px}
+  .conq .foot{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font:500 11px/1.5 "Spline Sans Mono",monospace;color:var(--faint)}
+  .conq .foot b{color:var(--muted)}
+
+  .empty-state{padding:46px 22px;text-align:center;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:14px}
   .empty-state b{color:var(--ink);display:block;margin-bottom:6px;font-size:15px}
-  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
-    color:var(--faint);font:500 12px/1.7 "Spline Sans Mono",monospace}
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font:500 12px/1.7 "Spline Sans Mono",monospace}
   footer b{color:var(--muted)}
-  @media (max-width:560px){.controls{gap:16px}.mrow .ci{display:none}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -141,7 +134,7 @@
 <div class="wrap">
   <div class="eyebrow">LND · Storyteller Project</div>
   <h1>Runeterra <em>Meta</em></h1>
-  <p class="sub">Live ranked deck statistics, crawled from the Riot API and grouped by champion archetype. Win rates show a 95% confidence interval — the smaller the sample, the wider the range.</p>
+  <p class="sub">Live ranked deck statistics from the Riot API. Win rates are Bayes-smoothed so thin samples read sensibly — a 1–0 record shows as "near 50%, barely known", not a fake 100%.</p>
   <div class="meta" id="meta"></div>
 
   <div class="controls">
@@ -150,262 +143,257 @@
     <div class="ctl"><span>Window</span><div class="seg" id="seg-window"></div></div>
   </div>
 
+  <div class="viewbar">
+    <div class="tabs" id="tabs"></div>
+    <div class="smooth">
+      <span id="kappa"></span>
+      <div class="seg" id="seg-smooth"></div>
+    </div>
+  </div>
+
   <div id="content"></div>
   <footer id="foot"></footer>
 </div>
 
 <script>
 const REGION_LABEL = { europe:'EU', americas:'NA', asia:'APAC' };
-const REGION_NAME = { DE:'Demacia',FR:'Freljord',IO:'Ionia',NX:'Noxus',PZ:'Piltover & Zaun',
-  SI:'Shadow Isles',BW:'Bilgewater',SH:'Shurima',MT:'Mount Targon',BC:'Bandle City',RU:'Runeterra' };
-const FACTION_REF = {FACTION_DEMACIA_NAME:'DE',FACTION_FRELJORD_NAME:'FR',FACTION_IONIA_NAME:'IO',
-  FACTION_NOXUS_NAME:'NX',FACTION_PILTOVER_NAME:'PZ',FACTION_SHADOWISLES_NAME:'SI',
-  FACTION_BILGEWATER_NAME:'BW',FACTION_SHURIMA_NAME:'SH',FACTION_MTTARGON_NAME:'MT',FACTION_BANDLECITY_NAME:'BC'};
+const REGION_NAME = { DE:'Demacia',FR:'Freljord',IO:'Ionia',NX:'Noxus',PZ:'Piltover & Zaun',SI:'Shadow Isles',BW:'Bilgewater',SH:'Shurima',MT:'Mount Targon',BC:'Bandle City',RU:'Runeterra' };
+const FACTION_REF = {FACTION_DEMACIA_NAME:'DE',FACTION_FRELJORD_NAME:'FR',FACTION_IONIA_NAME:'IO',FACTION_NOXUS_NAME:'NX',FACTION_PILTOVER_NAME:'PZ',FACTION_SHADOWISLES_NAME:'SI',FACTION_BILGEWATER_NAME:'BW',FACTION_SHURIMA_NAME:'SH',FACTION_MTTARGON_NAME:'MT',FACTION_BANDLECITY_NAME:'BC'};
 const regionCode = f => FACTION_REF[f] || (/^[A-Z]{2}$/.test(f) ? f : 'RU');
-
-function normalizeLabel(label){
-  const m = String(label).match(/^(.*?)\s*\(([^)]*)\)\s*$/);
-  if(!m) return label;
-  const regions = [...new Set(m[2].split('/').map(s=>regionCode(s.trim())))].sort();
-  return `${m[1].trim()} (${regions.join('/')})`;
-}
+function normalizeLabel(label){ const m=String(label).match(/^(.*?)\s*\(([^)]*)\)\s*$/); if(!m)return label;
+  const r=[...new Set(m[2].split('/').map(s=>regionCode(s.trim())))].sort(); return `${m[1].trim()} (${r.join('/')})`; }
 function regionsOf(label){ const m=String(label).match(/\(([^)]*)\)\s*$/); return m?m[1].split('/'):[]; }
 function deckName(label){ return label.replace(/\s*\([^)]*\)\s*$/,''); }
-function chips(label){
-  return `<span class="chips">`+regionsOf(label).map(r=>
-    `<span class="chip" style="background:var(--r-${r},#9aa6b8)" title="${REGION_NAME[r]||r}">${r}</span>`).join('')+`</span>`;
-}
-// Wilson 95% interval
-function wilson(w,n){ if(!n) return [0,0]; const z=1.96,p=w/n,d=1+z*z/n,c=p+z*z/(2*n),
-  m=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n)); return [(c-m)/d,(c+m)/d]; }
-function wrColor(wr){
-  if(wr==null) return 'var(--mid)';
-  const t=Math.max(0,Math.min(1,(wr-0.35)/0.30)), bad=[224,87,92], good=[70,184,138];
-  const c=bad.map((b,i)=>Math.round(b+(good[i]-b)*t)); return `rgb(${c[0]},${c[1]},${c[2]})`;
-}
-
-const MIN_GAMES = 3;       // práh pro matici
-const META_MIN = 0.01;     // WRmeta: jen soupeři s >=1% playrate
-const state = { region:'all', format:'all', window:14, sort:'play', selected:null };
-let STATS = null;
-const todayKey = () => new Date().toISOString().slice(0,10);
-
-function aggregate(){
-  const days = STATS.days || {};
-  const cutoff = state.window
-    ? new Date(Date.now()-(state.window-1)*864e5).toISOString().slice(0,10)
-    : STATS.patchStart;
-  const today = todayKey();
-  const deck = {}, mu = {};
-  for(const [d, regs] of Object.entries(days)){
-    if(d < cutoff || d > today) continue;
-    for(const [reg, fmts] of Object.entries(regs)){
-      if(state.region !== 'all' && reg !== state.region) continue;
-      for(const [fmt, b] of Object.entries(fmts)){
-        if(state.format !== 'all' && fmt !== state.format) continue;
-        for(const [k,v] of Object.entries(b.deckGames||{})){
-          const n=normalizeLabel(k); (deck[n]??={games:0,wins:0}); deck[n].games+=v.games; deck[n].wins+=v.wins;
-        }
-        for(const [k,v] of Object.entries(b.matchups||{})){
-          const i=k.indexOf('@@'); if(i<0) continue;
-          const nk=normalizeLabel(k.slice(0,i))+'@@'+normalizeLabel(k.slice(i+2));
-          (mu[nk]??={games:0,wins:0}); mu[nk].games+=v.games; mu[nk].wins+=v.wins;
-        }
-      }
-    }
-  }
-  return {deck, mu};
-}
-
-function computeDecks(deck, mu){
-  const total = Object.values(deck).reduce((a,d)=>a+d.games,0);
-  const decks = Object.entries(deck).map(([label,v])=>{
-    const wr = v.games ? v.wins/v.games : 0;
-    const [lo,hi] = wilson(v.wins, v.games);
-    return { label, games:v.games, wins:v.wins, wr, ciLo:lo, ciHi:hi,
-             play: total ? v.games/total : 0 };
-  });
-  const playOf = {}; decks.forEach(d=>playOf[d.label]=d.play);
-  // WRmeta: WR jen proti soupeřům s playrate >= META_MIN
-  decks.forEach(d=>{
-    let g=0,w=0;
-    for(const [k,v] of Object.entries(mu)){
-      const i=k.indexOf('@@'); if(k.slice(0,i)!==d.label) continue;
-      const opp=k.slice(i+2);
-      if((playOf[opp]||0) >= META_MIN){ g+=v.games; w+=v.wins; }
-    }
-    d.wrMetaGames=g; d.wrMeta = g ? w/g : null;
-  });
-  return { decks, total };
-}
-
-function fmtWR(wr){ return wr==null ? '—' : (wr*100).toFixed(0)+'%'; }
+function champsOf(label){ const n=deckName(label); if(/^champless$/i.test(n)) return []; return n.split('/').map(c=>c.split(':')[0].trim()); }
+function chips(label){ return `<span class="chips">`+regionsOf(label).map(r=>`<span class="chip" style="background:var(--r-${r},#9aa6b8)" title="${REGION_NAME[r]||r}">${r}</span>`).join('')+`</span>`; }
+function esc(s){ return String(s).replace(/'/g,"\\'"); }
+function wilson(w,n){ if(!n)return[0,0]; const z=1.96,p=w/n,d=1+z*z/n,c=p+z*z/(2*n),m=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n)); return [(c-m)/d,(c+m)/d]; }
+function wrColor(wr){ if(wr==null)return 'var(--mid)'; const t=Math.max(0,Math.min(1,(wr-0.35)/0.30)),bad=[224,87,92],good=[70,184,138];
+  const c=bad.map((b,i)=>Math.round(b+(good[i]-b)*t)); return `rgb(${c[0]},${c[1]},${c[2]})`; }
+function fmtWR(wr){ return wr==null?'—':(wr*100).toFixed(0)+'%'; }
 function fmtCI(lo,hi){ return `${(lo*100).toFixed(0)}–${(hi*100).toFixed(0)}`; }
 
-function render(){
-  const {deck, mu} = aggregate();
-  const {decks, total} = computeDecks(deck, mu);
-  const root = document.getElementById('content');
+const MIN_GAMES=3, META_MIN=0.01, CAND_N=14, FIELD_MIN=0.005;
+const state = { region:'all', format:'all', window:14, sort:'play', selected:null, view:'meta', smooth:true, requireDeck:'' };
+let STATS=null, KAPPA=8;
+const todayKey=()=>new Date().toISOString().slice(0,10);
 
-  if(total === 0){
-    state.selected = null;
-    root.innerHTML = `<div class="empty-state"><b>No games here yet</b>
-      Nothing collected for this region/format/window. ${state.region!=='all'?'This region may still be filling up.':'Try a wider window.'}</div>`;
-    return;
-  }
-  const byLabel = Object.fromEntries(decks.map(d=>[d.label,d]));
-  const maxPlay = Math.max(...decks.map(d=>d.play), 1e-6);
+function aggregate(){
+  const days=STATS.days||{};
+  const cutoff=state.window?new Date(Date.now()-(state.window-1)*864e5).toISOString().slice(0,10):STATS.patchStart;
+  const today=todayKey(); const deck={},mu={};
+  for(const[d,regs]of Object.entries(days)){ if(d<cutoff||d>today)continue;
+    for(const[reg,fmts]of Object.entries(regs)){ if(state.region!=='all'&&reg!==state.region)continue;
+      for(const[fmt,b]of Object.entries(fmts)){ if(state.format!=='all'&&fmt!==state.format)continue;
+        for(const[k,v]of Object.entries(b.deckGames||{})){const n=normalizeLabel(k);(deck[n]??={games:0,wins:0});deck[n].games+=v.games;deck[n].wins+=v.wins;}
+        for(const[k,v]of Object.entries(b.matchups||{})){const i=k.indexOf('@@');if(i<0)continue;const nk=normalizeLabel(k.slice(0,i))+'@@'+normalizeLabel(k.slice(i+2));(mu[nk]??={games:0,wins:0});mu[nk].games+=v.games;mu[nk].wins+=v.wins;}
+      }}}
+  return {deck,mu};
+}
+function estimateKappa(mu){
+  const ps=[],sv=[];
+  for(const v of Object.values(mu)){ if(v.games<2)continue; const p=v.wins/v.games; ps.push(p); sv.push(p*(1-p)/v.games); }
+  if(ps.length<5) return 8;
+  const mean=ps.reduce((a,b)=>a+b,0)/ps.length;
+  const obs=ps.reduce((a,b)=>a+(b-mean)**2,0)/ps.length;
+  const msv=sv.reduce((a,b)=>a+b,0)/sv.length;
+  const tv=obs-msv; if(tv<=0)return 40;
+  return Math.max(4,Math.min(40,0.25/tv-1));
+}
+// stažená/raw WR matchupu a->b
+function muWR(mu,a,b){ const e=mu[`${a}@@${b}`];
+  if(state.smooth) return e?(e.wins+KAPPA/2)/(e.games+KAPPA):0.5;
+  return e&&e.games?e.wins/e.games:null; }
+function muCalc(mu,a,b){ const v=muWR(mu,a,b); return v==null?0.5:v; }   // pro výpočty (nikdy null)
+function muGames(mu,a,b){ const e=mu[`${a}@@${b}`]; return e?e.games:0; }
 
-  // sort
-  const sorted = decks.slice().sort((a,b)=>
-    state.sort==='win' ? (b.wr-a.wr || b.games-a.games) : (b.games-a.games));
+function computeDecks(deck,mu){
+  const total=Object.values(deck).reduce((a,d)=>a+d.games,0);
+  const decks=Object.entries(deck).map(([label,v])=>{
+    const rawWR=v.games?v.wins/v.games:0;
+    const wr=state.smooth?(v.wins+KAPPA/2)/(v.games+KAPPA):rawWR;
+    let lo,hi;
+    if(state.smooth){ const a=v.wins+KAPPA/2,b=v.games-v.wins+KAPPA/2,m=a/(a+b),sd=Math.sqrt(a*b/((a+b)**2*(a+b+1)));
+      lo=Math.max(0,m-1.96*sd); hi=Math.min(1,m+1.96*sd); } else { [lo,hi]=wilson(v.wins,v.games); }
+    return {label,games:v.games,wins:v.wins,rawWR,wr,ciLo:lo,ciHi:hi,play:total?v.games/total:0};
+  });
+  const playOf={}; decks.forEach(d=>playOf[d.label]=d.play);
+  decks.forEach(d=>{ // exp WR proti poli (vážená playratem)
+    let num=0,den=0;
+    for(const o of decks){ if(o.label===d.label)continue; if(o.play<FIELD_MIN)continue; num+=o.play*muCalc(mu,d.label,o.label); den+=o.play; }
+    d.expWR=den?num/den:null;
+  });
+  return {decks,total,playOf};
+}
 
-  // ---- deck detail ----
-  let detailHtml = '';
-  if(state.selected && byLabel[state.selected]){
-    const d = byLabel[state.selected];
-    const rows = Object.entries(mu)
-      .filter(([k])=>k.startsWith(state.selected+'@@'))
-      .map(([k,v])=>{ const opp=k.slice(k.indexOf('@@')+2); const [lo,hi]=wilson(v.wins,v.games);
-        return {opp, games:v.games, wins:v.wins, wr:v.wins/v.games, lo, hi, play:byLabel[opp]?byLabel[opp].play:0}; })
-      .sort((a,b)=>b.play-a.play || b.games-a.games);
-    detailHtml = `<div class="detail">
-      <div class="dhead">
-        <div class="dtitle">${chips(d.label)} ${deckName(d.label)}</div>
-        <button class="close" onclick="clearSel()" aria-label="Close">✕</button>
-      </div>
-      <div class="stat">
-        <div><span class="k">Games</span><b>${d.games}</b></div>
-        <div><span class="k">Play rate</span><b>${(d.play*100).toFixed(1)}%</b></div>
-        <div><span class="k">Win rate</span><b style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</b><span class="ci">95% CI ${fmtCI(d.ciLo,d.ciHi)}</span></div>
-        <div><span class="k">WR vs meta</span><b>${fmtWR(d.wrMeta)}</b><span class="ci">${d.wrMetaGames} games</span></div>
-      </div>
-      <div class="mlist">${
-        rows.length ? rows.map(r=>`<div class="mrow">
-          <div class="opp">${chips(r.opp)}<span>${deckName(r.opp)}</span></div>
-          <div class="rec">${r.wins}/${r.games}</div>
-          <div class="wrcell" style="color:${wrColor(r.wr)}">${fmtWR(r.wr)}</div>
-          <div class="ci">${fmtCI(r.lo,r.hi)}</div>
-        </div>`).join('') : '<div style="padding:16px 0;color:var(--faint)">No recorded matchups yet.</div>'}
-      </div>
-      <div style="margin-top:12px;font:500 11px/1.5 'Spline Sans Mono',monospace;color:var(--faint)">
-        Matchups ordered by opponent play rate · win % is this deck vs that opponent</div>
-    </div>`;
-  }
+// ---------- COUNTER EXPLORER (detail) ----------
+function renderDetail(decks,mu,byLabel){
+  if(!state.selected||!byLabel[state.selected]) return '';
+  const d=byLabel[state.selected];
+  const rows=decks.filter(o=>o.label!==d.label).map(o=>{
+    const wr=muWR(mu,d.label,o.label), g=muGames(mu,d.label,o.label);
+    return {opp:o.label,play:o.play,wr,g,wins:(mu[`${d.label}@@${o.label}`]||{}).wins||0};
+  }).filter(r=>r.wr!=null || r.g>0);
+  const withWR=r=>r.wr==null?0.5:r.wr;
+  const beats=rows.filter(r=>withWR(r)>=0.5).sort((a,b)=>withWR(b)-withWR(a)||b.play-a.play).slice(0,10);
+  const loses=rows.filter(r=>withWR(r)<0.5).sort((a,b)=>withWR(a)-withWR(b)||b.play-a.play).slice(0,10);
+  const row=r=>`<div class="mrow"><div class="opp">${chips(r.opp)}<span>${deckName(r.opp)}</span></div>
+    <div class="pr">${(r.play*100).toFixed(1)}%</div><div class="rec">${r.g?r.wins+'/'+r.g:'—'}</div>
+    <div class="wrcell" style="color:${wrColor(withWR(r))}">${fmtWR(r.wr)}</div></div>`;
+  return `<div class="detail">
+    <div class="dhead"><div class="dtitle">${chips(d.label)} ${deckName(d.label)}</div>
+      <button class="close" onclick="clearSel()" aria-label="Close">✕</button></div>
+    <div class="stat">
+      <div><span class="k">Games</span><b>${d.games}</b></div>
+      <div><span class="k">Play rate</span><b>${(d.play*100).toFixed(1)}%</b></div>
+      <div><span class="k">Win rate</span><b style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</b><span class="ci">${fmtCI(d.ciLo,d.ciHi)}</span></div>
+      <div><span class="k">Exp WR vs field</span><b style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</b></div>
+    </div>
+    <div class="cols">
+      <div><h4 class="good">You're favored ▸ play more vs these</h4>${beats.length?beats.map(row).join(''):'<div class="ci" style="padding:10px 0">No favorable matchups recorded.</div>'}</div>
+      <div><h4 class="bad">You're unfavored ▸ these answer you</h4>${loses.length?loses.map(row).join(''):'<div class="ci" style="padding:10px 0">No bad matchups recorded.</div>'}</div>
+    </div>
+    <div class="ci" style="margin-top:14px">% = win rate vs that deck · middle = play rate, then record · ordered by win rate then how common the opponent is</div>
+  </div>`;
+}
 
-  // ---- meta table ----
-  const arrow = k => state.sort===k ? ' ↓' : '';
-  const metaTable = `<div class="scroll"><table class="list"><thead><tr>
+// ---------- META VIEW ----------
+function renderMeta(decks,total,mu,byLabel){
+  const maxPlay=Math.max(...decks.map(d=>d.play),1e-6);
+  const sorted=decks.slice().sort((a,b)=>
+    state.sort==='win'?(b.wr-a.wr||b.games-a.games):
+    state.sort==='exp'?((b.expWR??0)-(a.expWR??0)||b.games-a.games):(b.games-a.games));
+  const arrow=k=>state.sort===k?' ↓':'';
+  const table=`<div class="scroll"><table class="list"><thead><tr>
       <th>Archetype</th>
       <th class="num sortable ${state.sort==='play'?'active':''}" onclick="setSort('play')">Play${arrow('play')}</th>
       <th class="num">Games</th>
       <th class="num sortable ${state.sort==='win'?'active':''}" onclick="setSort('win')">Win${arrow('win')}</th>
-      <th class="num">95% CI</th>
-      <th class="num">WR vs meta</th>
+      <th class="num">CI</th>
+      <th class="num sortable ${state.sort==='exp'?'active':''}" onclick="setSort('exp')">Exp WR${arrow('exp')}</th>
     </tr></thead><tbody>`+
-    sorted.map(d=>`<tr class="${d.label===state.selected?'sel':''}" onclick="selDeck('${d.label.replace(/'/g,"\\'")}')">
+    sorted.map(d=>`<tr class="${d.label===state.selected?'sel':''}" onclick="selDeck('${esc(d.label)}')">
       <td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td>
       <td class="num">${(d.play*100).toFixed(1)}%<div class="pbar"><i style="width:${(d.play/maxPlay*100).toFixed(0)}%"></i></div></td>
       <td class="num" style="color:var(--muted)">${d.games}</td>
-      <td class="num" style="color:${d.games>=MIN_GAMES?wrColor(d.wr):'var(--faint)'}">${fmtWR(d.wr)}</td>
+      <td class="num" style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</td>
       <td class="num ci">${fmtCI(d.ciLo,d.ciHi)}</td>
-      <td class="num" style="color:${d.wrMeta!=null?wrColor(d.wrMeta):'var(--faint)'}">${fmtWR(d.wrMeta)}</td>
+      <td class="num" style="color:${d.expWR!=null?wrColor(d.expWR):'var(--faint)'}">${fmtWR(d.expWR)}</td>
     </tr>`).join('')+`</tbody></table></div>`;
 
-  // ---- matchup matrix ----
-  const top = decks.filter(d=>d.games>=MIN_GAMES).sort((a,b)=>b.games-a.games).slice(0,12);
-  let mxHtml;
-  if(top.length<2){
-    mxHtml = `<div class="empty-state">Not enough decks with ${MIN_GAMES}+ games yet to build a matrix.</div>`;
-  } else {
-    const cell = (r,c)=>{
-      if(r.label===c.label) return `<td class="diag">—</td>`;
-      const e = mu[`${r.label}@@${c.label}`];
-      if(!e || !e.games) return `<td class="empty">·</td>`;
-      const wr=e.wins/e.games, [lo,hi]=wilson(e.wins,e.games), low=e.games<3?' low':'';
-      return `<td class="${low.trim()}" style="background:${wrColor(wr)}" title="${deckName(r.label)} vs ${deckName(c.label)} — ${e.wins}/${e.games} · ${(wr*100).toFixed(0)}% (${fmtCI(lo,hi)})">${(wr*100).toFixed(0)}</td>`;
-    };
-    mxHtml = `<div class="scroll"><table class="mx"><thead><tr>
-        <th></th><th class="lead">N</th><th class="lead">WR<br>meta</th>`+
-      top.map(c=>`<th><div class="v" title="${c.label}" onclick="selDeck('${c.label.replace(/'/g,"\\'")}')">${deckName(c.label)}</div></th>`).join('')+
+  const top=decks.filter(d=>d.games>=MIN_GAMES).sort((a,b)=>b.games-a.games).slice(0,12);
+  let mx;
+  if(top.length<2){ mx=`<div class="empty-state">Not enough decks with ${MIN_GAMES}+ games yet to build a matrix.</div>`; }
+  else{
+    const cell=(r,c)=>{ if(r.label===c.label)return `<td class="diag">—</td>`;
+      const wr=muWR(mu,r.label,c.label), g=muGames(mu,r.label,c.label);
+      if(wr==null) return `<td class="empty">·</td>`;
+      const e=mu[`${r.label}@@${c.label}`]||{wins:0,games:0}, low=g>0&&g<3?' low':(g===0?' low':'');
+      const tip=g?`${e.wins}/${g}`:'no games (prior 50%)';
+      return `<td class="${low.trim()}" style="background:${wrColor(wr)}" title="${deckName(r.label)} vs ${deckName(c.label)} — ${tip} · ${(wr*100).toFixed(0)}%">${(wr*100).toFixed(0)}</td>`; };
+    mx=`<div class="scroll"><table class="mx"><thead><tr><th></th><th class="lead">N</th><th class="lead">Exp<br>WR</th>`+
+      top.map(c=>`<th><div class="v" title="${c.label}" onclick="selDeck('${esc(c.label)}')">${deckName(c.label)}</div></th>`).join('')+
       `</tr></thead><tbody>`+
-      top.map(r=>`<tr>
-        <th title="${r.label}" onclick="selDeck('${r.label.replace(/'/g,"\\'")}')">${deckName(r.label)}</th>
-        <td class="lead">${r.games}</td>
-        <td class="lead" style="color:${r.wrMeta!=null?wrColor(r.wrMeta):'var(--faint)'}">${fmtWR(r.wrMeta)}</td>`+
-        top.map(c=>cell(r,c)).join('')+`</tr>`).join('')+
-      `</tbody></table></div>
-      <div class="legend"><span>Unfavored</span>
-        <span class="scale"><i style="background:${wrColor(.35)}"></i><i style="background:${wrColor(.5)}"></i><i style="background:${wrColor(.65)}"></i></span>
-        <span>Favored · cell = row's win% vs column · faded = under 3 games · hover for sample + CI</span></div>`;
+      top.map(r=>`<tr><th title="${r.label}" onclick="selDeck('${esc(r.label)}')">${deckName(r.label)}</th>
+        <td class="lead">${r.games}</td><td class="lead" style="color:${r.expWR!=null?wrColor(r.expWR):'var(--faint)'}">${fmtWR(r.expWR)}</td>`+
+        top.map(c=>cell(r,c)).join('')+`</tr>`).join('')+`</tbody></table></div>
+      <div class="legend"><span>Unfavored</span><span class="scale"><i style="background:${wrColor(.35)}"></i><i style="background:${wrColor(.5)}"></i><i style="background:${wrColor(.65)}"></i></span>
+        <span>cell = row's win% vs column · faded = thin sample · hover for record</span></div>`;
   }
-
-  root.innerHTML = detailHtml + `
+  return renderDetail(decks,mu,byLabel)+`
     <section><div class="head"><h2>Meta</h2>
-      <span class="note">${decks.length} archetypes · ${total} deck appearances · click a deck for matchups</span>
-      <span class="spacer"></span>
-      <button class="linkbtn" onclick="downloadCSV()">Download CSV</button></div>${metaTable}</section>
-    <section><div class="head"><h2>Matchup matrix</h2>
-      <span class="note">top ${Math.min(12,top.length)} by play rate</span></div>${mxHtml}</section>`;
+      <span class="note">${decks.length} archetypes · ${total} appearances · ${state.sort==='exp'?'sorted by expected WR vs field':'click a deck for its matchups'}</span>
+      <span class="spacer"></span><button class="linkbtn" onclick="downloadCSV()">Download CSV</button></div>${table}</section>
+    <section><div class="head"><h2>Matchup matrix</h2><span class="note">top ${Math.min(12,top.length)} by play rate</span></div>${mx}</section>`;
 }
 
-// ---- interakce ----
-window.setSort = k => { state.sort=k; render(); };
-window.selDeck = label => { state.selected = (state.selected===label?null:label); render();
-  if(state.selected) document.querySelector('.detail')?.scrollIntoView({behavior:'smooth',block:'nearest'}); };
-window.clearSel = () => { state.selected=null; render(); };
-window.downloadCSV = () => {
-  const {deck,mu}=aggregate(); const {decks}=computeDecks(deck,mu);
-  const rows=[['archetype','games','play_rate','win_rate','ci_low','ci_high','wr_vs_meta','wr_meta_games']];
-  decks.sort((a,b)=>b.games-a.games).forEach(d=>rows.push([
-    deckName(d.label)+' '+regionsOf(d.label).join('/'), d.games,
-    (d.play*100).toFixed(2), (d.wr*100).toFixed(1), (d.ciLo*100).toFixed(1), (d.ciHi*100).toFixed(1),
-    d.wrMeta!=null?(d.wrMeta*100).toFixed(1):'', d.wrMetaGames]));
+// ---------- CONQUEST VIEW ----------
+function renderConquest(decks,mu){
+  const field=decks.filter(d=>d.play>=FIELD_MIN);
+  const cand=decks.slice().sort((a,b)=>b.games-a.games).slice(0,CAND_N);
+  const coverage=L=>{ let num=0,den=0; for(const D of field){ const best=Math.max(...L.map(x=>muCalc(mu,x.label,D.label))); num+=D.play*best; den+=D.play; } return den?num/den:0; };
+  const weakest=L=>{ let worst=null,wv=2; for(const D of field){ const best=Math.max(...L.map(x=>muCalc(mu,x.label,D.label))); if(best<wv){wv=best;worst=D;} } return {D:worst,v:wv}; };
+  const legal=L=>{ const seen=new Set(); for(const d of L) for(const c of champsOf(d.label)){ if(seen.has(c))return false; seen.add(c);} return true; };
+
+  const lineups=[];
+  for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++)for(let m=j+1;m<cand.length;m++){
+    const L=[cand[i],cand[j],cand[m]];
+    if(state.requireDeck && !L.some(x=>x.label===state.requireDeck)) continue;
+    if(legal(L)) lineups.push(L);
+  }
+  const scored=lineups.map(L=>{ const cov=coverage(L);
+    const subs=L.map((_,idx)=>coverage(L.filter((_,k)=>k!==idx)));
+    const postBan=Math.min(...subs); const linchpin=L[subs.indexOf(postBan)].label;
+    return {L,cov,postBan,linchpin,weak:weakest(L)}; }).sort((a,b)=>b.cov-a.cov).slice(0,12);
+
+  const opts=`<option value="">— any deck —</option>`+decks.slice().sort((a,b)=>b.games-a.games)
+    .map(d=>`<option value="${d.label}" ${d.label===state.requireDeck?'selected':''}>${deckName(d.label)} (${regionsOf(d.label).join('/')})</option>`).join('');
+
+  const cards = scored.length? `<div class="lineups">`+scored.map((x,i)=>`
+    <div class="conq ${i===0?'top':''}">
+      <div class="rank">#${i+1}</div>
+      <div class="cov" style="color:${wrColor(x.cov)}">${(x.cov*100).toFixed(1)}%</div>
+      <div class="covk">field coverage</div>
+      <div class="decks">${x.L.map(d=>`<div class="d" onclick="selDeckGo('${esc(d.label)}')">${chips(d.label)}<span>${deckName(d.label)}</span>${d.label===x.linchpin?'<span class="lp">ban bait</span>':''}</div>`).join('')}</div>
+      <div class="foot">After worst ban: <b>${(x.postBan*100).toFixed(1)}%</b> · weakest vs <b>${x.weak.D?deckName(x.weak.D.label):'—'}</b> (${(x.weak.v*100).toFixed(0)}%)</div>
+    </div>`).join('')+`</div>` : `<div class="empty-state"><b>No legal lineups yet</b>Need more decks with champions in this slice. Widen the window or clear the required deck.</div>`;
+
+  return `<div class="conqbar">
+      <span>Require deck:</span>
+      <select onchange="setRequire(this.value)">${opts}</select>
+      <span style="color:var(--faint)">champion-lock enforced · scored vs the current meta (play-weighted)</span>
+    </div>
+    <section style="margin-top:0"><div class="head"><h2>Best Conquest lineups</h2>
+      <span class="note">top legal 3-deck combos from the ${cand.length} most-played · coverage = your best deck's win% into the average opponent</span></div>${cards}</section>`;
+}
+
+function render(){
+  const {deck,mu}=aggregate(); KAPPA=estimateKappa(mu);
+  document.getElementById('kappa').textContent = state.smooth?`κ=${KAPPA.toFixed(0)}`:'raw';
+  const {decks,total,playOf}=computeDecks(deck,mu);
+  const root=document.getElementById('content');
+  if(total===0){ state.selected=null;
+    root.innerHTML=`<div class="empty-state"><b>No games here yet</b>Nothing collected for this region/format/window. ${state.region!=='all'?'This region may still be filling up.':'Try a wider window.'}</div>`; return; }
+  const byLabel=Object.fromEntries(decks.map(d=>[d.label,d]));
+  root.innerHTML = state.view==='conquest' ? renderConquest(decks,mu) : renderMeta(decks,total,mu,byLabel);
+}
+
+// interakce
+window.setSort=k=>{state.sort=k;render();};
+window.selDeck=label=>{state.selected=(state.selected===label?null:label);render(); if(state.selected)document.querySelector('.detail')?.scrollIntoView({behavior:'smooth',block:'nearest'});};
+window.selDeckGo=label=>{state.view='meta';state.selected=label;syncTabs();render();document.querySelector('.detail')?.scrollIntoView({behavior:'smooth',block:'nearest'});};
+window.clearSel=()=>{state.selected=null;render();};
+window.setRequire=v=>{state.requireDeck=v;render();};
+window.downloadCSV=()=>{ const {deck,mu}=aggregate(); const {decks}=computeDecks(deck,mu);
+  const rows=[['archetype','games','play_rate','win_rate','ci_low','ci_high','exp_wr_vs_field']];
+  decks.sort((a,b)=>b.games-a.games).forEach(d=>rows.push([deckName(d.label)+' '+regionsOf(d.label).join('/'),d.games,(d.play*100).toFixed(2),(d.wr*100).toFixed(1),(d.ciLo*100).toFixed(1),(d.ciHi*100).toFixed(1),d.expWR!=null?(d.expWR*100).toFixed(1):'']));
   const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download=`lnd-meta-${state.region}-${state.format}-${state.window||'patch'}d.csv`; a.click();
-  URL.revokeObjectURL(a.href);
-};
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`lnd-meta-${state.region}-${state.format}-${state.window||'patch'}d.csv`; a.click(); URL.revokeObjectURL(a.href); };
 
-function buildSeg(id, opts, key){
-  const el = document.getElementById(id);
-  el.innerHTML = opts.map(o=>`<button data-v="${o.v}" aria-pressed="${state[key]==o.v}">${o.t}</button>`).join('');
-  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{
-    let v=b.dataset.v; if(key==='window') v = v==='patch'?null:Number(v);
-    state[key]=v; state.selected=null;
-    el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', x===b));
-    render();
-  });
-}
+function syncTabs(){ document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===state.view)); }
+function buildSeg(id,opts,key,cb){ const el=document.getElementById(id);
+  el.innerHTML=opts.map(o=>`<button data-v="${o.v}" aria-pressed="${state[key]==o.v}">${o.t}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{ let v=b.dataset.v;
+    if(key==='window')v=v==='patch'?null:Number(v); if(key==='smooth')v=v==='1';
+    state[key]=v; if(key!=='smooth'&&key!=='view')state.selected=null;
+    el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); (cb||render)(); }); }
 
 function init(){
-  let totalGames=0;
-  for(const d of Object.keys(STATS.days||{})) for(const r of Object.values(STATS.days[d]))
-    for(const f of Object.values(r)) totalGames += Object.values(f.deckGames||{}).reduce((a,b)=>a+b.games,0);
-  const upd = STATS.generatedAt ? new Date(STATS.generatedAt) : null;
-  document.getElementById('meta').innerHTML =
-    `<span>Patch <b>${STATS.patchStart||'—'}</b></span><span class="dot">/</span>
-     <span><b>${Math.round(totalGames/2)}</b> matches</span><span class="dot">/</span>
-     <span>updated <b>${upd?upd.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</b></span>`;
-
-  const regions = STATS.regions || ['europe','americas','asia'];
-  buildSeg('seg-region', [{v:'all',t:'All'}, ...regions.map(r=>({v:r,t:REGION_LABEL[r]||r}))], 'region');
-  buildSeg('seg-format', [{v:'all',t:'All'},{v:'standard',t:'Standard'},{v:'eternal',t:'Eternal'}], 'format');
-  buildSeg('seg-window', [{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}], 'window');
-
-  document.getElementById('foot').innerHTML =
-    'Data crawled from the Riot LoR API, grouped by champions + regions. '+
-    '<b>WR vs meta</b> is win rate counting only opponents with ≥1% play rate (ignores fringe decks). '+
-    '<b>95% CI</b> is the Wilson interval — with small samples the true win rate sits anywhere in that range, so read low-game decks with care.';
+  let tg=0; for(const d of Object.keys(STATS.days||{}))for(const r of Object.values(STATS.days[d]))for(const f of Object.values(r))tg+=Object.values(f.deckGames||{}).reduce((a,b)=>a+b.games,0);
+  const upd=STATS.generatedAt?new Date(STATS.generatedAt):null;
+  document.getElementById('meta').innerHTML=`<span>Patch <b>${STATS.patchStart||'—'}</b></span><span class="dot">/</span><span><b>${Math.round(tg/2)}</b> matches</span><span class="dot">/</span><span>updated <b>${upd?upd.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</b></span>`;
+  const regions=STATS.regions||['europe','americas','asia'];
+  buildSeg('seg-region',[{v:'all',t:'All'},...regions.map(r=>({v:r,t:REGION_LABEL[r]||r}))],'region');
+  buildSeg('seg-format',[{v:'all',t:'All'},{v:'standard',t:'Standard'},{v:'eternal',t:'Eternal'}],'format');
+  buildSeg('seg-window',[{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}],'window');
+  buildSeg('seg-smooth',[{v:'1',t:'Smoothed'},{v:'0',t:'Raw'}],'smooth');
+  buildSeg('tabs',[{v:'meta',t:'Meta'},{v:'conquest',t:'Conquest'}],'view');
+  document.getElementById('foot').innerHTML='Data crawled from the Riot LoR API, grouped by champions + regions. <b>Smoothed</b> win rates use empirical-Bayes shrinkage (κ pseudo-games toward 50%) so small samples don\'t mislead. <b>Exp WR</b> = win rate vs the average opponent, weighted by current play rates. <b>Conquest</b> coverage assumes you bring your best-matched deck into each opponent; champion-lock is enforced.';
   render();
 }
-
-fetch('./data/stats.json', {cache:'no-store'})
-  .then(r=>r.json())
-  .then(d=>{ STATS=d; init(); })
-  .catch(e=>{ document.getElementById('content').innerHTML =
-    `<div class="empty-state"><b>Couldn't load stats.json</b>${e}</div>`; });
+fetch('./data/stats.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{STATS=d;init();})
+  .catch(e=>{document.getElementById('content').innerHTML=`<div class="empty-state"><b>Couldn't load stats.json</b>${e}</div>`;});
 </script>
 </body>
 </html>
