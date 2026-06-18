@@ -13,7 +13,7 @@
   "seeds": {
     "europe": ["Storyteller#7X3Y"],
     "americas": ["mbrookz#NA1"],
-    "asia": []
+    "asia": ["Dauthan#Apac1", "Dauthan#Apac"]
   },
   "dataDragonSets": [
     "set1", "set2", "set3", "set4", "set5", "set6", "set6cde",
