@@ -169,27 +169,17 @@ function decodeDeck(code) {
 
 // ---------------------------------------------------------------------------
 // Archetype label:  "Champ/champ (Region/region)" abecedně
-// Pozn.: pole `factions` z API vrací reference (FACTION_DEMACIA_NAME, ...),
-// ne dvoupísmenné kódy. Runeterra-championi mají vlastní FACTION_<champ>_NAME
-// (i card-refs CARD_..RU..) -> region RU.
+// Regiony odvozujeme PŘÍMO z kódů karet (např. 01NX038 -> NX), ne z pole
+// `factions` z API, které je nespolehlivé (u některých decků vrací reference
+// championa místo regionu). Kód karty má region vždy na pozici 2-3.
 // ---------------------------------------------------------------------------
-const FACTION_REF = {
-  FACTION_DEMACIA_NAME: 'DE', FACTION_FRELJORD_NAME: 'FR', FACTION_IONIA_NAME: 'IO',
-  FACTION_NOXUS_NAME: 'NX', FACTION_PILTOVER_NAME: 'PZ', FACTION_SHADOWISLES_NAME: 'SI',
-  FACTION_BILGEWATER_NAME: 'BW', FACTION_SHURIMA_NAME: 'SH', FACTION_MTTARGON_NAME: 'MT',
-  FACTION_BANDLECITY_NAME: 'BC'
-};
-function regionCode(f) {
-  const s = String(f);
-  if (FACTION_REF[s]) return FACTION_REF[s];
-  if (/^[A-Z]{2}$/.test(s)) return s;   // už čistý kód
-  return 'RU';                          // Runeterra championi / card-refs
-}
-
 function buildLabel(deckCode, factions, champMap) {
-  const regions = [...new Set((factions || []).map(regionCode))].sort();
+  const codes = decodeDeck(deckCode);
+  const regions = [...new Set(
+    codes.map(c => c.slice(2, 4)).filter(r => /^[A-Z]{2}$/.test(r))
+  )].sort();
   const champs = [...new Set(
-    decodeDeck(deckCode).map(code => champMap[code]).filter(Boolean)
+    codes.map(code => champMap[code]).filter(Boolean)
   )].sort();
   const regionPart = regions.length ? `(${regions.join('/')})` : '(??)';
   return champs.length ? `${champs.join('/')} ${regionPart}` : `champless ${regionPart}`;
