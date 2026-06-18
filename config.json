@@ -12,8 +12,8 @@
   "champRefreshHours": 168,
   "seeds": {
     "europe": ["Storyteller#7X3Y"],
-    "americas": ["theStoryteller#7XZY"],
-    "asia": ["Mfaalb#apac"]
+    "americas": ["mbrookz#NA1"],
+    "asia": []
   },
   "dataDragonSets": [
     "set1", "set2", "set3", "set4", "set5", "set6", "set6cde",
