@@ -338,8 +338,10 @@ async function main() {
   try {
     for (const cluster of cfg.regions) {
       const acct = ACCOUNT_CLUSTER[cluster] || cluster;
-      state.regions[cluster] ??= { frontier: [], visited: [] };
+      state.regions[cluster] ??= {};
       const reg = state.regions[cluster];
+      reg.frontier ??= [];          // Firebase zahazuje prázdná pole -> doplň
+      reg.visited ??= [];
       const visited = new Set(reg.visited);
       const startUsed = limiter.used;
 
