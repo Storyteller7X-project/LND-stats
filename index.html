@@ -24,14 +24,14 @@
   .controls{display:flex;flex-wrap:wrap;gap:22px;margin:30px 0 8px;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
   .ctl{display:flex;flex-direction:column;gap:8px}
   .ctl>span{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
-  .seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;flex-wrap:wrap}
   .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:500 13px/1 Inter,sans-serif;padding:8px 13px;border-radius:7px;cursor:pointer;transition:background .15s,color .15s}
   .seg button:hover{color:var(--ink)}
   .seg button[aria-pressed="true"]{background:var(--panel2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
   .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   .viewbar{display:flex;align-items:center;gap:16px;margin-top:30px;flex-wrap:wrap}
-  .tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
-  .tabs button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:Fraunces,serif;font-weight:560;font-size:16px;padding:9px 18px;border-radius:8px;cursor:pointer}
+  .tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;flex-wrap:wrap}
+  .tabs button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:Fraunces,serif;font-weight:560;font-size:15.5px;padding:9px 16px;border-radius:8px;cursor:pointer}
   .tabs button[aria-pressed="true"]{background:var(--gold);color:#0b0f17}
   .tabs button:not([aria-pressed="true"]):hover{color:var(--ink)}
   .smooth{display:flex;align-items:center;gap:10px;margin-left:auto;font:500 11.5px/1 "Spline Sans Mono",monospace;color:var(--faint)}
@@ -71,31 +71,37 @@
   table.mx td.sig::after{content:"";position:absolute;left:3px;top:3px;width:5px;height:5px;border-radius:50%;background:#0b0f17;opacity:.55}
   .legend{display:flex;align-items:center;gap:8px;margin-top:14px;font:500 11px/1 "Spline Sans Mono",monospace;color:var(--faint);flex-wrap:wrap}
   .legend .scale{display:flex;height:9px;width:150px;border-radius:5px;overflow:hidden}.legend .scale i{flex:1}
-  .detail{border:1px solid var(--gold);border-radius:16px;background:var(--panel);padding:22px;margin-bottom:26px;animation:fade .25s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .detail .dhead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
-  .detail .dtitle{font-family:Fraunces,serif;font-weight:560;font-size:22px;display:flex;align-items:center;gap:10px}
-  .detail .close{margin-left:auto;appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px}
-  .detail .close:hover{color:var(--ink);border-color:var(--gold)}
-  .detail .stat{display:flex;gap:24px;margin:14px 0 4px;flex-wrap:wrap;font:500 13px/1.3 "Spline Sans Mono",monospace}
-  .detail .stat b{display:block;font-family:Fraunces,serif;font-size:20px;font-weight:640;margin-top:3px}
-  .detail .stat .k{color:var(--faint);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:20px}
+  .stat{display:flex;gap:24px;flex-wrap:wrap;font:500 13px/1.3 "Spline Sans Mono",monospace}
+  .stat b{display:block;font-family:Fraunces,serif;font-size:20px;font-weight:640;margin-top:3px}
+  .stat .k{color:var(--faint);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+  .panel{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:22px;margin-bottom:22px}
+  .panel.gold{border-color:var(--gold)}
+  .dtitle{font-family:Fraunces,serif;font-weight:560;font-size:24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:18px}
   @media (max-width:680px){.cols{grid-template-columns:1fr;gap:18px}}
-  .cols h4{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.16em;text-transform:uppercase;margin:0 0 6px;color:var(--faint)}
-  .cols h4.good{color:var(--good)}.cols h4.bad{color:var(--bad)}
+  .cols h4,.subh{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.16em;text-transform:uppercase;margin:0 0 10px;color:var(--faint)}
+  h4.good{color:var(--good)}h4.bad{color:var(--bad)}
   .mrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(39,49,63,.5)}
   .mrow .opp{flex:1;display:flex;align-items:center;gap:8px;min-width:0;font-size:13px}.mrow .opp span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .mrow .pr{font:500 10.5px/1 "Spline Sans Mono",monospace;color:var(--faint);width:42px;text-align:right}
   .mrow .rec{font:500 11px/1 "Spline Sans Mono",monospace;color:var(--muted);width:42px;text-align:right}
   .mrow .wrcell{font:600 13px/1 "Spline Sans Mono",monospace;width:40px;text-align:right}
   .mrow .sigd{width:12px;color:var(--gold);font-size:11px;text-align:center}
-  .submodes{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:20px;width:fit-content}
+  /* composition / cards */
+  .cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:12px;margin-top:6px}
+  .card{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--panel2);aspect-ratio:680/1024}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .qty{position:absolute;top:6px;left:6px;background:rgba(11,15,23,.85);color:var(--gold);font:600 12px/1 "Spline Sans Mono",monospace;padding:4px 7px;border-radius:6px}
+  .card .inc{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(11,15,23,.92));color:var(--ink);font:500 10px/1 "Spline Sans Mono",monospace;padding:14px 6px 5px;text-align:right}
+  .card .nm{position:absolute;bottom:0;left:0;right:0;padding:12px 6px 4px;font:600 9.5px/1.1 Inter,sans-serif;background:linear-gradient(transparent,rgba(11,15,23,.92))}
+  .deckpick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;font:500 12.5px/1.4 "Spline Sans Mono",monospace;color:var(--muted)}
+  select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:500 13px/1 Inter,sans-serif;max-width:300px}
+  /* conquest */
+  .submodes{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:20px;width:fit-content;flex-wrap:wrap}
   .submodes button{appearance:none;border:0;background:transparent;color:var(--muted);font:500 13px/1 Inter,sans-serif;padding:9px 15px;border-radius:7px;cursor:pointer}
   .submodes button[aria-pressed="true"]{background:var(--teal);color:#0b0f17;font-weight:600}
   .submodes button:not([aria-pressed="true"]):hover{color:var(--ink)}
   .conqbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;font:500 12.5px/1.4 "Spline Sans Mono",monospace;color:var(--muted)}
-  select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:500 12.5px/1 Inter,sans-serif;max-width:230px}
   .lineups{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
   .conq{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px 18px}
   .conq.top{border-color:var(--gold)}
@@ -112,23 +118,22 @@
   .lpick h4{font:600 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px}
   .lpick h4.me{color:var(--teal)}.lpick h4.them{color:var(--bad)}
   .lpick .sel3{display:flex;flex-direction:column;gap:8px}.lpick select{max-width:none;width:100%}
-  .banres{border:1px solid var(--gold);border-radius:16px;background:var(--panel);padding:22px;margin-bottom:24px}
   .banres .big{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-end}
   .banres .mwin{font-family:Fraunces,serif;font-weight:640;font-size:46px;line-height:.9}
-  .banres .mk{font:500 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .mk{font:500 10.5px/1 "Spline Sans Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
   .banres .rec{font-size:14px;line-height:1.7}.banres .rec b{color:var(--ink)}
-  .banres .ban{color:var(--good);font-weight:600}.banres .exposed{color:var(--bad);font-weight:600}
+  .ban{color:var(--good);font-weight:600}.exposed{color:var(--bad);font-weight:600}
   .grid33{border-collapse:collapse;margin-top:18px;font:500 11px/1 "Spline Sans Mono",monospace}
   .grid33 th{color:var(--muted);font-weight:500;padding:6px 8px;text-align:right;font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .grid33 thead th{text-align:center;vertical-align:bottom;color:var(--faint)}
   .grid33 td{width:46px;height:34px;text-align:center;color:#0b0f17;font-weight:600;border-radius:4px}
   .trend{display:grid;grid-template-columns:1fr 1fr;gap:26px}
   @media (max-width:680px){.trend{grid-template-columns:1fr}}
-  .trow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(39,49,63,.5);cursor:pointer}
-  .trow:hover{background:var(--panel2)}
+  .trow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(39,49,63,.5);cursor:pointer}.trow:hover{background:var(--panel2)}
   .trow .nm{flex:1;display:flex;align-items:center;gap:8px;min-width:0;font-size:13.5px}.trow .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .trow .delta{font:600 12px/1 "Spline Sans Mono",monospace;width:60px;text-align:right}
-  .trow .sub{font:500 10.5px/1 "Spline Sans Mono",monospace;color:var(--faint);width:96px;text-align:right}
+  .trow .subc{font:500 10.5px/1 "Spline Sans Mono",monospace;color:var(--faint);width:96px;text-align:right}
+  .close{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;margin-left:auto}.close:hover{color:var(--ink);border-color:var(--gold)}
   .empty-state{padding:46px 22px;text-align:center;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:14px}
   .empty-state b{color:var(--ink);display:block;margin-bottom:6px;font-size:15px}
   footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font:500 12px/1.7 "Spline Sans Mono",monospace}footer b{color:var(--muted)}
@@ -139,7 +144,7 @@
 <div class="wrap">
   <div class="eyebrow">LND · Storyteller Project</div>
   <h1>Runeterra <em>Meta</em></h1>
-  <p class="sub">Live ranked stats from the Riot API, with Bayes-smoothed win rates and a tournament toolkit: matchup analysis, lineup building, ban planning.</p>
+  <p class="sub">Live ranked stats + a full tournament toolkit. Win rates are Bayes-smoothed; decks need 20+ games to be ranked.</p>
   <div class="meta" id="meta"></div>
   <div class="controls">
     <div class="ctl"><span>Region</span><div class="seg" id="seg-region"></div></div>
@@ -168,10 +173,12 @@ function wilson(w,n){if(!n)return[0,0];const z=1.96,p=w/n,d=1+z*z/n,c=p+z*z/(2*n
 function wrColor(wr){if(wr==null)return 'var(--mid)';const t=Math.max(0,Math.min(1,(wr-0.35)/0.30)),bad=[224,87,92],good=[70,184,138];const c=bad.map((b,i)=>Math.round(b+(good[i]-b)*t));return `rgb(${c[0]},${c[1]},${c[2]})`;}
 function fmtWR(wr){return wr==null?'—':(wr*100).toFixed(0)+'%';}
 function fmtCI(lo,hi){return `${(lo*100).toFixed(0)}–${(hi*100).toFixed(0)}`;}
+function fmt1(x){return (x*100).toFixed(1)+'%';}
+function cardImg(code){const set=parseInt(code.slice(0,2),10)||1;return `https://dd.b.pvp.net/latest/set${set}/en_us/img/cards/${code}.png`;}
 
-const MIN_GAMES=3,META_MIN=0.01,CAND_N=14,FIELD_MIN=0.005;
-const state={region:'all',format:'all',window:14,sort:'play',selected:null,view:'meta',smooth:true,requireDeck:'',conqMode:'build',myLineup:null,oppLineup:null};
-let STATS=null,KAPPA=8;
+const DECK_MIN=20, META_MIN=0.01, CAND_N=14, FIELD_MIN=0.005;
+const state={region:'all',format:'all',window:null,sort:'play',selected:null,view:'meta',smooth:true,requireDeck:'',conqMode:'build',myLineup:null,oppLineup:null};
+let STATS=null,KAPPA=8,COMP={},CHAMPMAP={};
 const todayKey=()=>new Date().toISOString().slice(0,10);
 
 function aggregate(){
@@ -192,7 +199,6 @@ function muWR(mu,a,b){const e=mu[`${a}@@${b}`];if(state.smooth)return e?(e.wins+
 function muCalc(mu,a,b){const v=muWR(mu,a,b);return v==null?0.5:v;}
 function muGames(mu,a,b){const e=mu[`${a}@@${b}`];return e?e.games:0;}
 function muSig(mu,a,b){const e=mu[`${a}@@${b}`];if(!e||!e.games)return false;const[lo,hi]=wilson(e.wins,e.games);return lo>0.5||hi<0.5;}
-
 function computeDecks(deck,mu){
   const total=Object.values(deck).reduce((a,d)=>a+d.games,0);
   const decks=Object.entries(deck).map(([label,v])=>{
@@ -203,92 +209,101 @@ function computeDecks(deck,mu){
   decks.forEach(d=>{let num=0,den=0;for(const o of decks){if(o.label===d.label)continue;if(o.play<FIELD_MIN)continue;num+=o.play*muCalc(mu,d.label,o.label);den+=o.play;}d.expWR=den?num/den:null;});
   return {decks,total};
 }
-
-// ---- Conquest match-win (memoized minimax) ----
-function makeMatchWin(mu){const memo=new Map();
-  function mw(my,opp){if(!my.length)return 1;if(!opp.length)return 0;
-    const key=my.join('|')+'#'+opp.join('|');if(memo.has(key))return memo.get(key);
-    let best=-1;for(const i of my){let worst=2;for(const j of opp){const p=muCalc(mu,i,j);
-      const v=p*mw(my.filter(x=>x!==i),opp)+(1-p)*mw(my,opp.filter(x=>x!==j));if(v<worst)worst=v;}if(worst>best)best=worst;}
-    memo.set(key,best);return best;}
-  return mw;}
-function banHelper(M,O,mw){let bestO=null,bestVal=-1,theirBan=null;
-  for(const o of O){let worst=2,wm=null;for(const m of M){const v=mw(M.filter(x=>x!==m),O.filter(x=>x!==o));if(v<worst){worst=v;wm=m;}}if(worst>bestVal){bestVal=worst;bestO=o;theirBan=wm;}}
-  return {banTheir:bestO,theyBan:theirBan,matchWin:bestVal};}
+function makeMatchWin(mu){const memo=new Map();function mw(my,opp){if(!my.length)return 1;if(!opp.length)return 0;const key=my.join('|')+'#'+opp.join('|');if(memo.has(key))return memo.get(key);let best=-1;for(const i of my){let worst=2;for(const j of opp){const p=muCalc(mu,i,j);const v=p*mw(my.filter(x=>x!==i),opp)+(1-p)*mw(my,opp.filter(x=>x!==j));if(v<worst)worst=v;}if(worst>best)best=worst;}memo.set(key,best);return best;}return mw;}
+function banHelper(M,O,mw){let bestO=null,bestVal=-1,theirBan=null;for(const o of O){let worst=2,wm=null;for(const m of M){const v=mw(M.filter(x=>x!==m),O.filter(x=>x!==o));if(v<worst){worst=v;wm=m;}}if(worst>bestVal){bestVal=worst;bestO=o;theirBan=wm;}}return {banTheir:bestO,theyBan:theirBan,matchWin:bestVal};}
 function legalLineup(L){const seen=new Set();for(const d of L)for(const c of champsOf(d)){if(seen.has(c))return false;seen.add(c);}return true;}
 function pickLineup(decks,exclude){const used=new Set(),out=[];for(const d of decks){if(out.length>=3)break;if(exclude&&exclude.has(d.label))continue;const ch=champsOf(d.label);if(ch.some(c=>used.has(c)))continue;ch.forEach(c=>used.add(c));out.push(d.label);}while(out.length<3)out.push('');return out;}
 
-function fmt1(x){return (x*100).toFixed(1)+'%';}
+// composition index (normalized labels)
+function buildComp(){COMP={};for(const[k,v]of Object.entries(STATS.comp||{})){const nk=normalizeLabel(k);(COMP[nk]??={n:0,c:{}});COMP[nk].n+=v.n||0;for(const[code,arr]of Object.entries(v.c||{})){const e=(COMP[nk].c[code]??=[0,0]);e[0]+=arr[0];e[1]+=arr[1];}}CHAMPMAP=STATS.champMap||{};}
+function compFor(label){const c=COMP[label];if(!c||!c.n)return null;
+  const cards=Object.entries(c.c).map(([code,[decks,copies]])=>({code,decks,copies,incl:decks/c.n,typical:Math.max(1,Math.round(copies/decks)),isChamp:!!CHAMPMAP[code]})).sort((a,b)=>b.incl-a.incl||b.copies-a.copies);
+  return {n:c.n,cards};}
 
-// ---------------- COUNTER EXPLORER ----------------
-function renderDetail(decks,mu,byLabel){
-  if(!state.selected||!byLabel[state.selected])return '';
-  const d=byLabel[state.selected];
+// ---------- counter explorer (matchups) ----------
+function matchupCols(decks,mu,d){
   const rows=decks.filter(o=>o.label!==d.label).map(o=>{const wr=muWR(mu,d.label,o.label),g=muGames(mu,d.label,o.label);return {opp:o.label,play:o.play,wr,g,wins:(mu[`${d.label}@@${o.label}`]||{}).wins||0,sig:muSig(mu,d.label,o.label)};}).filter(r=>r.wr!=null||r.g>0);
   const W=r=>r.wr==null?0.5:r.wr;
-  const beats=rows.filter(r=>W(r)>=0.5).sort((a,b)=>W(b)-W(a)||b.play-a.play).slice(0,10);
-  const loses=rows.filter(r=>W(r)<0.5).sort((a,b)=>W(a)-W(b)||b.play-a.play).slice(0,10);
+  const beats=rows.filter(r=>W(r)>=0.5).sort((a,b)=>W(b)-W(a)||b.play-a.play).slice(0,12);
+  const loses=rows.filter(r=>W(r)<0.5).sort((a,b)=>W(a)-W(b)||b.play-a.play).slice(0,12);
   const row=r=>`<div class="mrow"><div class="opp">${chips(r.opp)}<span>${deckName(r.opp)}</span></div><div class="sigd">${r.sig?'✓':''}</div><div class="pr">${fmt1(r.play)}</div><div class="rec">${r.g?r.wins+'/'+r.g:'—'}</div><div class="wrcell" style="color:${wrColor(W(r))}">${fmtWR(r.wr)}</div></div>`;
-  return `<div class="detail"><div class="dhead"><div class="dtitle">${chips(d.label)} ${deckName(d.label)}</div><button class="close" onclick="clearSel()">✕</button></div>
-    <div class="stat"><div><span class="k">Games</span><b>${d.games}</b></div><div><span class="k">Play rate</span><b>${fmt1(d.play)}</b></div>
-      <div><span class="k">Win rate</span><b style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</b><span class="ci">${fmtCI(d.ciLo,d.ciHi)}</span></div>
-      <div><span class="k">Exp WR vs field</span><b style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</b></div></div>
-    <div class="cols"><div><h4 class="good">You're favored ▸ play more vs these</h4>${beats.length?beats.map(row).join(''):'<div class="ci" style="padding:10px 0">None recorded.</div>'}</div>
-      <div><h4 class="bad">You're unfavored ▸ these answer you</h4>${loses.length?loses.map(row).join(''):'<div class="ci" style="padding:10px 0">None recorded.</div>'}</div></div>
-    <div class="ci" style="margin-top:14px">✓ = statistically distinguishable from 50% · % = win rate vs that deck · then play rate &amp; record</div></div>`;
+  return `<div class="cols"><div><h4 class="good">Favored ▸ play vs these</h4>${beats.length?beats.map(row).join(''):'<div class="ci" style="padding:10px 0">None recorded.</div>'}</div>
+    <div><h4 class="bad">Unfavored ▸ these answer you</h4>${loses.length?loses.map(row).join(''):'<div class="ci" style="padding:10px 0">None recorded.</div>'}</div></div>`;
 }
 
-// ---------------- META ----------------
-function renderMeta(decks,total,mu,byLabel){
-  const maxPlay=Math.max(...decks.map(d=>d.play),1e-6);
-  const sorted=decks.slice().sort((a,b)=>state.sort==='win'?(b.wr-a.wr||b.games-a.games):state.sort==='exp'?((b.expWR??0)-(a.expWR??0)||b.games-a.games):(b.games-a.games));
+// ---------- META ----------
+function renderMeta(decks,total,mu){
+  const shown=decks.filter(d=>d.games>=DECK_MIN);
+  if(!shown.length)return `<div class="empty-state"><b>No decks with ${DECK_MIN}+ games yet</b>The collector is gathering — this fills in as games accumulate. (Total ${total} appearances so far.)</div>`;
+  const maxPlay=Math.max(...shown.map(d=>d.play),1e-6);
+  const sorted=shown.slice().sort((a,b)=>state.sort==='win'?(b.wr-a.wr||b.games-a.games):state.sort==='exp'?((b.expWR??0)-(a.expWR??0)||b.games-a.games):(b.games-a.games));
   const arrow=k=>state.sort===k?' ↓':'';
   const table=`<div class="scroll"><table class="list"><thead><tr><th>Archetype</th>
     <th class="num sortable ${state.sort==='play'?'active':''}" onclick="setSort('play')">Play${arrow('play')}</th><th class="num">Games</th>
     <th class="num sortable ${state.sort==='win'?'active':''}" onclick="setSort('win')">Win${arrow('win')}</th><th class="num">CI</th>
     <th class="num sortable ${state.sort==='exp'?'active':''}" onclick="setSort('exp')">Exp WR${arrow('exp')}</th></tr></thead><tbody>`+
-    sorted.map(d=>`<tr class="${d.label===state.selected?'sel':''}" onclick="selDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td>
+    sorted.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td>
     <td class="num">${fmt1(d.play)}<div class="pbar"><i style="width:${(d.play/maxPlay*100).toFixed(0)}%"></i></div></td>
     <td class="num" style="color:var(--muted)">${d.games}</td><td class="num" style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</td>
     <td class="num ci">${fmtCI(d.ciLo,d.ciHi)}</td><td class="num" style="color:${d.expWR!=null?wrColor(d.expWR):'var(--faint)'}">${fmtWR(d.expWR)}</td></tr>`).join('')+`</tbody></table></div>`;
-
-  const top=decks.filter(d=>d.games>=MIN_GAMES).sort((a,b)=>b.games-a.games).slice(0,12);
-  let mx;
-  if(top.length<2){mx=`<div class="empty-state">Not enough decks with ${MIN_GAMES}+ games yet.</div>`;}
-  else{const cell=(r,c)=>{if(r.label===c.label)return `<td class="diag">—</td>`;const wr=muWR(mu,r.label,c.label),g=muGames(mu,r.label,c.label);if(wr==null)return `<td class="empty">·</td>`;
-    const e=mu[`${r.label}@@${c.label}`]||{wins:0,games:0},cls=(g>0&&g<3?'low ':'')+(muSig(mu,r.label,c.label)?'sig':'');const tip=g?`${e.wins}/${g}`:'no games (prior)';
-    return `<td class="${cls.trim()}" style="background:${wrColor(wr)}" title="${deckName(r.label)} vs ${deckName(c.label)} — ${tip} · ${(wr*100).toFixed(0)}%">${(wr*100).toFixed(0)}</td>`;};
-    mx=`<div class="scroll"><table class="mx"><thead><tr><th></th><th class="lead">N</th><th class="lead">Exp<br>WR</th>`+
-      top.map(c=>`<th><div class="v" title="${c.label}" onclick="selDeck('${esc(c.label)}')">${deckName(c.label)}</div></th>`).join('')+`</tr></thead><tbody>`+
-      top.map(r=>`<tr><th title="${r.label}" onclick="selDeck('${esc(r.label)}')">${deckName(r.label)}</th><td class="lead">${r.games}</td><td class="lead" style="color:${r.expWR!=null?wrColor(r.expWR):'var(--faint)'}">${fmtWR(r.expWR)}</td>`+
-        top.map(c=>cell(r,c)).join('')+`</tr>`).join('')+`</tbody></table></div>
-      <div class="legend"><span>Unfavored</span><span class="scale"><i style="background:${wrColor(.35)}"></i><i style="background:${wrColor(.5)}"></i><i style="background:${wrColor(.65)}"></i></span><span>Favored · row vs column · ● = significant (CI excludes 50%) · faded = thin</span></div>`;}
-
-  // pocket picks
-  const plays=decks.map(d=>d.play).sort((a,b)=>a-b);const med=plays[Math.floor(plays.length/2)]||0;
-  const pocket=decks.filter(d=>d.play<=med&&d.games>=MIN_GAMES&&d.expWR!=null&&d.expWR>0.5).sort((a,b)=>b.expWR-a.expWR).slice(0,6);
-  const pocketHtml=pocket.length?`<div class="scroll"><table class="list"><thead><tr><th>Sleeper</th><th class="num">Exp WR</th><th class="num">Play</th><th class="num">Games</th></tr></thead><tbody>`+
-    pocket.map(d=>`<tr onclick="selDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td><td class="num" style="color:var(--faint)">${d.games}</td></tr>`).join('')+`</tbody></table></div>`
-    :`<div class="empty-state">No clear sleepers yet — needs more data (low-play decks with a winning record vs the field).</div>`;
-
-  return renderDetail(decks,mu,byLabel)+`
-    <section><div class="head"><h2>Meta</h2><span class="note">${decks.length} archetypes · ${total} appearances · click a deck for matchups</span><span class="spacer"></span><button class="linkbtn" onclick="downloadCSV()">Download CSV</button></div>${table}</section>
-    <section><div class="head"><h2>Matchup matrix</h2><span class="note">top ${Math.min(12,top.length)} by play rate</span></div>${mx}</section>
-    <section><div class="head"><h2>Pocket picks</h2><span class="note">under-played decks that beat the field — tournament surprises</span></div>${pocketHtml}</section>`;
+  return `<section><div class="head"><h2>Meta decks</h2><span class="note">${shown.length} decks ≥${DECK_MIN} games · click for deck detail</span><span class="spacer"></span><button class="linkbtn" onclick="downloadCSV()">CSV</button></div>${table}</section>`;
 }
 
-// ---------------- CONQUEST ----------------
-function deckOptions(decks,selected){return `<option value="">— pick deck —</option>`+decks.slice().sort((a,b)=>b.games-a.games).map(d=>`<option value="${d.label}" ${d.label===selected?'selected':''}>${deckName(d.label)} (${regionsOf(d.label).join('/')})</option>`).join('');}
-function lineupBox(cls,title,who,arr,decks){return `<div class="box"><h4 class="${cls}">${title}</h4><div class="sel3">`+
-  [0,1,2].map(i=>`<select onchange="setLineup('${who}',${i},this.value)">${deckOptions(decks,arr[i])}</select>`).join('')+`</div></div>`;}
+// ---------- DECKS (composition + matchups) ----------
+function renderDecks(decks,mu){
+  const pool=decks.filter(d=>d.games>=DECK_MIN).sort((a,b)=>b.games-a.games);
+  if(!pool.length)return `<div class="empty-state"><b>No decks with ${DECK_MIN}+ games yet</b>Deck detail unlocks once archetypes reach the sample threshold.</div>`;
+  if(!state.selected||!decks.find(d=>d.label===state.selected))state.selected=pool[0].label;
+  const opts=pool.map(d=>`<option value="${d.label}" ${d.label===state.selected?'selected':''}>${deckName(d.label)} (${regionsOf(d.label).join('/')}) · ${d.games}g</option>`).join('');
+  const d=decks.find(x=>x.label===state.selected);
+  const comp=compFor(state.selected);
+  let compHtml;
+  if(!comp){compHtml=`<div class="empty-state" style="margin-top:18px"><b>Composition still collecting</b>Card data for this archetype hasn't accumulated yet — it appears once enough decklists are seen.</div>`;}
+  else{
+    const champs=comp.cards.filter(c=>c.isChamp);
+    const core=comp.cards.filter(c=>!c.isChamp&&c.incl>=0.85);
+    const flex=comp.cards.filter(c=>!c.isChamp&&c.incl>=0.2&&c.incl<0.85);
+    const cardEl=c=>`<div class="card"><img src="${cardImg(c.code)}" loading="lazy" alt="${CHAMPMAP[c.code]||c.code}" onerror="this.parentNode.classList.add('noimg');this.remove()"><span class="qty">×${c.typical}</span><span class="inc">${(c.incl*100).toFixed(0)}%</span>${CHAMPMAP[c.code]?`<span class="nm">${CHAMPMAP[c.code]}</span>`:''}</div>`;
+    const grp=(t,arr)=>arr.length?`<div class="subh" style="margin-top:18px">${t} · ${arr.length}</div><div class="cardgrid">${arr.map(cardEl).join('')}</div>`:'';
+    compHtml=`${grp('Champions',champs)}${grp('Core cards (≥85% of lists)',core)}${grp('Flex / tech slots (variable)',flex)}
+      <div class="ci" style="margin-top:14px">Based on ${comp.n} decklists · ×N = typical copies · % = how many lists run it · flex slots are where pilots differ</div>`;
+  }
+  return `<div class="deckpick"><span>Deck:</span><select onchange="openDeck(this.value)">${opts}</select></div>
+    <div class="panel gold"><div class="dtitle">${chips(d.label)} ${deckName(d.label)}</div>
+      <div class="stat" style="margin-top:14px"><div><span class="k">Games</span><b>${d.games}</b></div><div><span class="k">Play</span><b>${fmt1(d.play)}</b></div>
+        <div><span class="k">Win</span><b style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</b><span class="ci">${fmtCI(d.ciLo,d.ciHi)}</span></div>
+        <div><span class="k">Exp WR vs field</span><b style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</b></div></div></div>
+    <section style="margin-top:0"><div class="head"><h2>Deck composition</h2><span class="note">average list · champions, core, flex</span></div>${compHtml}</section>
+    <section><div class="head"><h2>Matchups</h2><span class="note">✓ = significant</span></div>${matchupCols(decks,mu,d)}</section>`;
+}
 
-function renderConquest(decks,mu){
+// ---------- STATS (matchup matrix) ----------
+function renderStats(decks,mu){
+  const top=decks.filter(d=>d.games>=DECK_MIN).sort((a,b)=>b.games-a.games).slice(0,14);
+  if(top.length<2)return `<div class="empty-state"><b>Matrix needs ≥2 decks at ${DECK_MIN}+ games</b>Collecting…</div>`;
+  const cell=(r,c)=>{if(r.label===c.label)return `<td class="diag">—</td>`;const wr=muWR(mu,r.label,c.label),g=muGames(mu,r.label,c.label);if(wr==null)return `<td class="empty">·</td>`;
+    const e=mu[`${r.label}@@${c.label}`]||{wins:0,games:0},cls=(g>0&&g<5?'low ':'')+(muSig(mu,r.label,c.label)?'sig':'');
+    return `<td class="${cls.trim()}" style="background:${wrColor(wr)}" title="${deckName(r.label)} vs ${deckName(c.label)} — ${g?e.wins+'/'+g:'no games'} · ${(wr*100).toFixed(0)}%">${(wr*100).toFixed(0)}</td>`;};
+  const mx=`<div class="scroll"><table class="mx"><thead><tr><th></th><th class="lead">N</th><th class="lead">Exp<br>WR</th>`+
+    top.map(c=>`<th><div class="v" title="${c.label}" onclick="openDeck('${esc(c.label)}')">${deckName(c.label)}</div></th>`).join('')+`</tr></thead><tbody>`+
+    top.map(r=>`<tr><th title="${r.label}" onclick="openDeck('${esc(r.label)}')">${deckName(r.label)}</th><td class="lead">${r.games}</td><td class="lead" style="color:${r.expWR!=null?wrColor(r.expWR):'var(--faint)'}">${fmtWR(r.expWR)}</td>`+
+      top.map(c=>cell(r,c)).join('')+`</tr>`).join('')+`</tbody></table></div>
+    <div class="legend"><span>Unfavored</span><span class="scale"><i style="background:${wrColor(.35)}"></i><i style="background:${wrColor(.5)}"></i><i style="background:${wrColor(.65)}"></i></span><span>row vs column · ● = significant · faded = thin · click a name for deck detail</span></div>`;
+  return `<section><div class="head"><h2>Matchup matrix</h2><span class="note">top ${top.length} decks by play</span></div>${mx}</section>`;
+}
+
+// ---------- LINEUP (conquest) ----------
+function deckOptions(decks,sel){return `<option value="">— pick deck —</option>`+decks.slice().sort((a,b)=>b.games-a.games).map(d=>`<option value="${d.label}" ${d.label===sel?'selected':''}>${deckName(d.label)} (${regionsOf(d.label).join('/')})</option>`).join('');}
+function lineupBox(cls,title,who,arr,decks){return `<div class="box"><h4 class="${cls}">${title}</h4><div class="sel3">`+[0,1,2].map(i=>`<select onchange="setLineup('${who}',${i},this.value)">${deckOptions(decks,arr[i])}</select>`).join('')+`</div></div>`;}
+function renderLineup(decks,mu){
   const mw=makeMatchWin(mu);
-  const cand=decks.slice().sort((a,b)=>b.games-a.games).slice(0,CAND_N);
-  const sub=`<div class="submodes" id="submodes">
-    <button data-v="build" aria-pressed="${state.conqMode==='build'}" onclick="setConq('build')">Build vs meta</button>
-    <button data-v="counter" aria-pressed="${state.conqMode==='counter'}" onclick="setConq('counter')">Counter a lineup</button>
-    <button data-v="ban" aria-pressed="${state.conqMode==='ban'}" onclick="setConq('ban')">Ban helper</button></div>`;
+  const cand=decks.filter(d=>d.games>=DECK_MIN).sort((a,b)=>b.games-a.games).slice(0,CAND_N);
+  const allForPick=decks.slice().sort((a,b)=>b.games-a.games);
+  const sub=`<div class="submodes">
+    <button aria-pressed="${state.conqMode==='build'}" onclick="setConq('build')">Build vs meta</button>
+    <button aria-pressed="${state.conqMode==='counter'}" onclick="setConq('counter')">Counter a lineup</button>
+    <button aria-pressed="${state.conqMode==='ban'}" onclick="setConq('ban')">Ban helper</button></div>`;
+  if(cand.length<3)return sub+`<div class="empty-state"><b>Need 3+ decks at ${DECK_MIN}+ games</b>Lineup tools unlock once enough decks qualify.</div>`;
 
   if(state.conqMode==='build'){
     const field=decks.filter(d=>d.play>=FIELD_MIN);
@@ -296,64 +311,69 @@ function renderConquest(decks,mu){
     const weakest=L=>{let w=null,wv=2;for(const D of field){const best=Math.max(...L.map(x=>muCalc(mu,x,D.label)));if(best<wv){wv=best;w=D;}}return {D:w,v:wv};};
     const lineups=[];for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++)for(let m=j+1;m<cand.length;m++){const L=[cand[i].label,cand[j].label,cand[m].label];if(state.requireDeck&&!L.includes(state.requireDeck))continue;if(legalLineup(L))lineups.push(L);}
     const scored=lineups.map(L=>{const cov=coverage(L);const subs=L.map((_,idx)=>coverage(L.filter((_,k)=>k!==idx)));const pb=Math.min(...subs);return {L,cov,postBan:pb,linchpin:L[subs.indexOf(pb)],weak:weakest(L)};}).sort((a,b)=>b.cov-a.cov).slice(0,12);
-    const opts=`<option value="">— any deck —</option>`+decks.slice().sort((a,b)=>b.games-a.games).map(d=>`<option value="${d.label}" ${d.label===state.requireDeck?'selected':''}>${deckName(d.label)} (${regionsOf(d.label).join('/')})</option>`).join('');
+    const opts=`<option value="">— any deck —</option>`+cand.map(d=>`<option value="${d.label}" ${d.label===state.requireDeck?'selected':''}>${deckName(d.label)}</option>`).join('');
     const cards=scored.length?`<div class="lineups">`+scored.map((x,i)=>`<div class="conq ${i===0?'top':''}"><div class="rank">#${i+1}</div><div class="cov" style="color:${wrColor(x.cov)}">${fmt1(x.cov)}</div><div class="covk">field coverage</div>
-      <div class="decks">${x.L.map(l=>`<div class="d" onclick="selDeckGo('${esc(l)}')">${chips(l)}<span>${deckName(l)}</span>${l===x.linchpin?'<span class="lp">ban bait</span>':''}</div>`).join('')}</div>
-      <div class="foot">After worst ban: <b>${fmt1(x.postBan)}</b> · weakest vs <b>${x.weak.D?deckName(x.weak.D.label):'—'}</b> (${(x.weak.v*100).toFixed(0)}%)</div></div>`).join('')+`</div>`:`<div class="empty-state"><b>No legal lineups</b>Widen the window or clear the required deck.</div>`;
-    return sub+`<div class="conqbar"><span>Require deck:</span><select onchange="setRequire(this.value)">${opts}</select><span style="color:var(--faint)">champion-lock enforced · coverage = your best deck's win% into the average opponent</span></div>
-      <section style="margin-top:0"><div class="head"><h2>Best lineups vs the meta</h2><span class="note">top legal 3-deck combos from the ${cand.length} most-played</span></div>${cards}</section>`;
+      <div class="decks">${x.L.map(l=>`<div class="d" onclick="openDeck('${esc(l)}')">${chips(l)}<span>${deckName(l)}</span>${l===x.linchpin?'<span class="lp">ban bait</span>':''}</div>`).join('')}</div>
+      <div class="foot">After worst ban: <b>${fmt1(x.postBan)}</b> · weakest vs <b>${x.weak.D?deckName(x.weak.D.label):'—'}</b> (${(x.weak.v*100).toFixed(0)}%)</div></div>`).join('')+`</div>`:`<div class="empty-state">No legal lineups (try clearing the required deck).</div>`;
+    return sub+`<div class="conqbar"><span>Require deck:</span><select onchange="setRequire(this.value)">${opts}</select><span style="color:var(--faint)">champion-lock enforced · coverage = best deck's win% into the average opponent</span></div>
+      <section style="margin-top:0"><div class="head"><h2>Best lineups vs the meta</h2><span class="note">from the ${cand.length} most-played</span></div>${cards}</section>`;
   }
-
-  if(state.requireDeck){/*noop*/}
-  if(!state.oppLineup)state.oppLineup=pickLineup(decks,null);
-  if(!state.myLineup)state.myLineup=pickLineup(decks,new Set(state.oppLineup.filter(Boolean)));
+  if(!state.oppLineup)state.oppLineup=pickLineup(cand,null);
+  if(!state.myLineup)state.myLineup=pickLineup(cand,new Set(state.oppLineup.filter(Boolean)));
 
   if(state.conqMode==='counter'){
-    const O=state.oppLineup.filter(Boolean);
-    let body;
-    if(O.length<3){body=`<div class="empty-state">Pick the opponent's three decks above.</div>`;}
+    const O=state.oppLineup.filter(Boolean);let body;
+    if(O.length<3){body=`<div class="empty-state">Pick the opponent's three decks.</div>`;}
     else{const lineups=[];for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++)for(let m=j+1;m<cand.length;m++){const L=[cand[i].label,cand[j].label,cand[m].label];if(legalLineup(L))lineups.push(L);}
       const scored=lineups.map(L=>({L,...banHelper(L,O,mw)})).sort((a,b)=>b.matchWin-a.matchWin).slice(0,9);
       body=`<div class="lineups">`+scored.map((x,i)=>`<div class="conq ${i===0?'top':''}"><div class="rank">#${i+1}</div><div class="cov" style="color:${wrColor(x.matchWin)}">${fmt1(x.matchWin)}</div><div class="covk">match win vs them</div>
-        <div class="decks">${x.L.map(l=>`<div class="d" onclick="selDeckGo('${esc(l)}')">${chips(l)}<span>${deckName(l)}</span></div>`).join('')}</div>
+        <div class="decks">${x.L.map(l=>`<div class="d" onclick="openDeck('${esc(l)}')">${chips(l)}<span>${deckName(l)}</span></div>`).join('')}</div>
         <div class="foot">Ban their <b>${deckName(x.banTheir)}</b> · they'll likely ban your <b>${deckName(x.theyBan)}</b></div></div>`).join('')+`</div>`;}
-    return sub+`<div class="lpick">${lineupBox('them','Opponent lineup','opp',state.oppLineup,decks)}<div class="box" style="display:flex;align-items:center;justify-content:center;color:var(--faint);font:500 12px/1.6 'Spline Sans Mono',monospace;text-align:center">Pick the 3 decks you expect to face.<br>We find your best legal counter-lineups.</div></div>
-      <section style="margin-top:0"><div class="head"><h2>Best counter-lineups</h2><span class="note">scored by expected match win after optimal bans</span></div>${body}</section>`;
+    return sub+`<div class="lpick">${lineupBox('them','Opponent lineup','opp',state.oppLineup,allForPick)}<div class="box" style="display:flex;align-items:center;justify-content:center;color:var(--faint);font:500 12px/1.6 'Spline Sans Mono',monospace;text-align:center">Pick the 3 decks you expect.<br>We find your best legal counters.</div></div>
+      <section style="margin-top:0"><div class="head"><h2>Best counter-lineups</h2><span class="note">by match win after optimal bans</span></div>${body}</section>`;
   }
-
-  // ban helper
-  const M=state.myLineup.filter(Boolean),O=state.oppLineup.filter(Boolean);
-  let res;
+  const M=state.myLineup.filter(Boolean),O=state.oppLineup.filter(Boolean);let res;
   if(M.length<3||O.length<3){res=`<div class="empty-state">Pick all three decks for both lineups.</div>`;}
-  else{const bh=banHelper(M,O,mw);const meIllegal=!legalLineup(M),themIllegal=!legalLineup(O);
-    const g=`<table class="grid33"><thead><tr><th></th>${O.map(o=>`<th title="${o}">${deckName(o)}</th>`).join('')}</tr></thead><tbody>`+
-      M.map(m=>`<tr><th title="${m}">${deckName(m)}</th>${O.map(o=>{const wr=muCalc(mu,m,o);return `<td style="background:${wrColor(wr)}">${(wr*100).toFixed(0)}</td>`;}).join('')}</tr>`).join('')+`</tbody></table>`;
-    res=`<div class="banres"><div class="big"><div><div class="mk">Expected match win</div><div class="mwin" style="color:${wrColor(bh.matchWin)}">${fmt1(bh.matchWin)}</div></div>
+  else{const bh=banHelper(M,O,mw);const il=!legalLineup(M),io=!legalLineup(O);
+    const g=`<table class="grid33"><thead><tr><th></th>${O.map(o=>`<th title="${o}">${deckName(o)}</th>`).join('')}</tr></thead><tbody>`+M.map(m=>`<tr><th title="${m}">${deckName(m)}</th>${O.map(o=>{const wr=muCalc(mu,m,o);return `<td style="background:${wrColor(wr)}">${(wr*100).toFixed(0)}</td>`;}).join('')}</tr>`).join('')+`</tbody></table>`;
+    res=`<div class="panel gold banres"><div class="big"><div><div class="mk">Expected match win</div><div class="mwin" style="color:${wrColor(bh.matchWin)}">${fmt1(bh.matchWin)}</div></div>
       <div class="rec"><div class="mk">Plan</div>Ban their <span class="ban">${deckName(bh.banTheir)}</span><br>They'll likely ban your <span class="exposed">${deckName(bh.theyBan)}</span></div></div>
-      ${meIllegal||themIllegal?`<div class="ci" style="color:var(--bad);margin-top:12px">⚠ ${meIllegal?'Your':'Opponent'} lineup shares a champion (not champion-lock legal).</div>`:''}
+      ${il||io?`<div class="ci" style="color:var(--bad);margin-top:12px">⚠ ${il?'Your':'Opponent'} lineup shares a champion (not legal).</div>`:''}
       <div class="ci" style="margin-top:14px">Your decks (rows) win% vs theirs (cols):</div>${g}</div>`;}
-  return sub+`<div class="lpick">${lineupBox('me','Your lineup','my',state.myLineup,decks)}${lineupBox('them','Opponent lineup','opp',state.oppLineup,decks)}</div>
-    <section style="margin-top:0"><div class="head"><h2>Ban helper</h2><span class="note">optimal ban &amp; expected result, both sides champion-locked</span></div>${res}</section>`;
+  return sub+`<div class="lpick">${lineupBox('me','Your lineup','my',state.myLineup,allForPick)}${lineupBox('them','Opponent lineup','opp',state.oppLineup,allForPick)}</div>
+    <section style="margin-top:0"><div class="head"><h2>Ban helper</h2><span class="note">optimal ban &amp; expected result</span></div>${res}</section>`;
 }
 
-// ---------------- TRENDS ----------------
-function renderTrends(decks,mu,inWin){
-  if(inWin.length<2)return `<div class="empty-state"><b>Not enough days</b>Trends need at least two days of data in the window.</div>`;
-  const recentCut=inWin[Math.max(0,inWin.length-2)]; // poslední ~2 dny = "recent"
-  const tot={recent:0,earlier:0};
-  decks.forEach(d=>{d._r={games:0,wins:0};d._e={games:0,wins:0};for(const[day,x]of Object.entries(d.byDay||{})){const t=day>=recentCut?'_r':'_e';d[t].games+=x.games;d[t].wins+=x.wins;}tot.recent+=d._r.games;tot.earlier+=d._e.games;});
-  const rows=decks.map(d=>{const pr=tot.recent?d._r.games/tot.recent:0,pe=tot.earlier?d._e.games/tot.earlier:0;
-    const wrR=d._r.games?d._r.wins/d._r.games:null,wrE=d._e.games?d._e.wins/d._e.games:null;
-    return {label:d.label,dPlay:pr-pe,pr,pe,rg:d._r.games,eg:d._e.games,wrR,wrE,dWR:(wrR!=null&&wrE!=null)?wrR-wrE:null};}).filter(r=>r.rg+r.eg>=MIN_GAMES);
-  const risers=rows.slice().sort((a,b)=>b.dPlay-a.dPlay).slice(0,8);
-  const fallers=rows.slice().sort((a,b)=>a.dPlay-b.dPlay).slice(0,8);
-  const row=(r,up)=>`<div class="trow" onclick="selDeckGo('${esc(r.label)}')"><div class="nm">${chips(r.label)}<span>${deckName(r.label)}</span></div>
-    <div class="sub">${(r.pe*100).toFixed(1)}% → ${(r.pr*100).toFixed(1)}%</div>
-    <div class="delta" style="color:${up?'var(--good)':'var(--bad)'}">${r.dPlay>=0?'+':''}${(r.dPlay*100).toFixed(1)}</div></div>`;
-  return `<div class="head"><h2>Meta trends</h2><span class="note">play-rate change · recent days vs earlier in the window · click a deck for detail</span></div>
-    <div class="trend"><div><h4 class="cols" style="color:var(--good);font:600 10.5px/1 'Spline Sans Mono',monospace;letter-spacing:.16em;text-transform:uppercase;margin:0 0 6px">▲ Rising</h4>${risers.length?risers.map(r=>row(r,1)).join(''):'<div class="ci" style="padding:10px 0">No data.</div>'}</div>
-      <div><h4 style="color:var(--bad);font:600 10.5px/1 'Spline Sans Mono',monospace;letter-spacing:.16em;text-transform:uppercase;margin:0 0 6px">▼ Falling</h4>${fallers.length?fallers.map(r=>row(r,0)).join(''):'<div class="ci" style="padding:10px 0">No data.</div>'}</div></div>
-    <div class="ci" style="margin-top:16px">Numbers are play-rate share now vs earlier. With a short window the split is coarse; it sharpens as more days accumulate.</div>`;
+// ---------- ANALYSIS ----------
+function renderAnalysis(decks,mu,inWin){
+  const shown=decks.filter(d=>d.games>=DECK_MIN);
+  // meta-call: žebříček dle exp WR vs pole
+  const call=shown.slice().sort((a,b)=>(b.expWR??0)-(a.expWR??0)).slice(0,10);
+  const callHtml=call.length?`<div class="scroll"><table class="list"><thead><tr><th>What to play</th><th class="num">Exp WR</th><th class="num">Play</th><th class="num">Win</th><th class="num">Games</th></tr></thead><tbody>`+
+    call.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td><td class="num" style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</td><td class="num" style="color:var(--faint)">${d.games}</td></tr>`).join('')+`</tbody></table></div>`
+    :`<div class="empty-state">Needs decks at ${DECK_MIN}+ games.</div>`;
+  // pocket picks
+  const plays=shown.map(d=>d.play).sort((a,b)=>a-b);const med=plays[Math.floor(plays.length/2)]||0;
+  const pocket=shown.filter(d=>d.play<=med&&d.expWR!=null&&d.expWR>0.5).sort((a,b)=>b.expWR-a.expWR).slice(0,6);
+  const pocketHtml=pocket.length?`<div class="scroll"><table class="list"><thead><tr><th>Sleeper</th><th class="num">Exp WR</th><th class="num">Play</th></tr></thead><tbody>`+pocket.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty-state">No clear sleepers yet.</div>`;
+  // trends
+  let trendHtml='<div class="empty-state">Need ≥2 days of data.</div>';
+  if(inWin.length>=2){const rc=inWin[Math.max(0,inWin.length-2)];const tot={r:0,e:0};
+    decks.forEach(d=>{d._r=0;d._e=0;for(const[day,x]of Object.entries(d.byDay||{})){if(day>=rc)d._r+=x.games;else d._e+=x.games;}tot.r+=d._r;tot.e+=d._e;});
+    const rows=decks.map(d=>({label:d.label,dp:(tot.r?d._r/tot.r:0)-(tot.e?d._e/tot.e:0),rg:d._r,eg:d._e})).filter(r=>r.rg+r.eg>=DECK_MIN);
+    const ri=rows.slice().sort((a,b)=>b.dp-a.dp).slice(0,6),fa=rows.slice().sort((a,b)=>a.dp-b.dp).slice(0,6);
+    const tr=(r,up)=>`<div class="trow" onclick="openDeck('${esc(r.label)}')"><div class="nm">${chips(r.label)}<span>${deckName(r.label)}</span></div><div class="delta" style="color:${up?'var(--good)':'var(--bad)'}">${r.dp>=0?'+':''}${(r.dp*100).toFixed(1)}</div></div>`;
+    trendHtml=`<div class="trend"><div><h4 class="good">▲ Rising</h4>${ri.length?ri.map(r=>tr(r,1)).join(''):'<div class="ci">—</div>'}</div><div><h4 class="bad">▼ Falling</h4>${fa.length?fa.map(r=>tr(r,0)).join(''):'<div class="ci">—</div>'}</div></div>`;}
+  // win-condition pro vybraný deck (jádro z compFor)
+  let wc='';
+  if(state.selected){const c=compFor(state.selected);
+    if(c){const eng=c.cards.filter(x=>x.incl>=0.85).slice(0,6);
+      wc=`<section><div class="head"><h2>Win condition — ${deckName(state.selected)}</h2><span class="note">core engine (highest-inclusion cards)</span></div>
+        <div class="cardgrid">${eng.map(x=>`<div class="card"><img src="${cardImg(x.code)}" loading="lazy" onerror="this.remove()"><span class="qty">×${x.typical}</span>${CHAMPMAP[x.code]?`<span class="nm">${CHAMPMAP[x.code]}</span>`:''}</div>`).join('')}</div>
+        <div class="ci" style="margin-top:12px">These cards appear in nearly every list — the deck's plan runs through them. Pick a deck in <b>Decks</b> to change this.</div></section>`;}}
+  return `<section><div class="head"><h2>Meta-call</h2><span class="note">expected win rate vs the current field — what to queue right now</span></div>${callHtml}</section>
+    <section><div class="head"><h2>Pocket picks</h2><span class="note">under-played but beat the field</span></div>${pocketHtml}</section>
+    <section><div class="head"><h2>Trends</h2><span class="note">play-rate shift, recent vs earlier</span></div>${trendHtml}</section>${wc}`;
 }
 
 function render(){
@@ -361,27 +381,22 @@ function render(){
   document.getElementById('kappa').textContent=state.smooth?`κ=${KAPPA.toFixed(0)}`:'raw';
   const {decks,total}=computeDecks(deck,mu);
   const root=document.getElementById('content');
-  if(total===0){state.selected=null;root.innerHTML=`<div class="empty-state"><b>No games here yet</b>Nothing for this region/format/window. ${state.region!=='all'?'This region may still be filling up.':'Try a wider window.'}</div>`;return;}
-  const byLabel=Object.fromEntries(decks.map(d=>[d.label,d]));
-  root.innerHTML = state.view==='conquest'?renderConquest(decks,mu):state.view==='trends'?renderTrends(decks,mu,inWin):renderMeta(decks,total,mu,byLabel);
+  if(total===0){root.innerHTML=`<div class="empty-state"><b>No games here yet</b>Nothing for this region/format/window.</div>`;return;}
+  root.innerHTML = state.view==='decks'?renderDecks(decks,mu):state.view==='stats'?renderStats(decks,mu):state.view==='lineup'?renderLineup(decks,mu):state.view==='analysis'?renderAnalysis(decks,mu,inWin):renderMeta(decks,total,mu);
 }
-
 window.setSort=k=>{state.sort=k;render();};
-window.selDeck=l=>{state.selected=(state.selected===l?null:l);render();if(state.selected)document.querySelector('.detail')?.scrollIntoView({behavior:'smooth',block:'nearest'});};
-window.selDeckGo=l=>{state.view='meta';state.selected=l;syncTabs();render();document.querySelector('.detail')?.scrollIntoView({behavior:'smooth',block:'nearest'});};
-window.clearSel=()=>{state.selected=null;render();};
+window.openDeck=l=>{state.selected=l;state.view='decks';syncTabs();render();window.scrollTo({top:0,behavior:'smooth'});};
 window.setRequire=v=>{state.requireDeck=v;render();};
 window.setConq=m=>{state.conqMode=m;render();};
 window.setLineup=(who,i,v)=>{const arr=who==='my'?(state.myLineup||=['','','']):(state.oppLineup||=['','','']);arr[i]=v;render();};
-window.downloadCSV=()=>{const {deck,mu}=aggregate();const {decks}=computeDecks(deck,mu);const rows=[['archetype','games','play_rate','win_rate','ci_low','ci_high','exp_wr_vs_field']];
-  decks.sort((a,b)=>b.games-a.games).forEach(d=>rows.push([deckName(d.label)+' '+regionsOf(d.label).join('/'),d.games,(d.play*100).toFixed(2),(d.wr*100).toFixed(1),(d.ciLo*100).toFixed(1),(d.ciHi*100).toFixed(1),d.expWR!=null?(d.expWR*100).toFixed(1):'']));
-  const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`lnd-meta-${state.region}-${state.format}-${state.window||'patch'}d.csv`;a.click();URL.revokeObjectURL(a.href);};
-
+window.downloadCSV=()=>{const {deck,mu}=aggregate();const {decks}=computeDecks(deck,mu);const rows=[['archetype','games','play_rate','win_rate','ci_low','ci_high','exp_wr']];
+  decks.filter(d=>d.games>=DECK_MIN).sort((a,b)=>b.games-a.games).forEach(d=>rows.push([deckName(d.label)+' '+regionsOf(d.label).join('/'),d.games,(d.play*100).toFixed(2),(d.wr*100).toFixed(1),(d.ciLo*100).toFixed(1),(d.ciHi*100).toFixed(1),d.expWR!=null?(d.expWR*100).toFixed(1):'']));
+  const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`lnd-meta.csv`;a.click();URL.revokeObjectURL(a.href);};
 function syncTabs(){document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===state.view));}
 function buildSeg(id,opts,key,cb){const el=document.getElementById(id);el.innerHTML=opts.map(o=>`<button data-v="${o.v}" aria-pressed="${state[key]==o.v}">${o.t}</button>`).join('');
-  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{let v=b.dataset.v;if(key==='window')v=v==='patch'?null:Number(v);if(key==='smooth')v=v==='1';state[key]=v;if(key!=='smooth'&&key!=='view')state.selected=null;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));(cb||render)();});}
-
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{let v=b.dataset.v;if(key==='window')v=v==='patch'?null:Number(v);if(key==='smooth')v=v==='1';state[key]=v;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));(cb||render)();});}
 function init(){
+  buildComp();
   let tg=0;for(const d of Object.keys(STATS.days||{}))for(const r of Object.values(STATS.days[d]))for(const f of Object.values(r))tg+=Object.values(f.deckGames||{}).reduce((a,b)=>a+b.games,0);
   const upd=STATS.generatedAt?new Date(STATS.generatedAt):null;
   document.getElementById('meta').innerHTML=`<span>Patch <b>${STATS.patchStart||'—'}</b></span><span class="dot">/</span><span><b>${Math.round(tg/2)}</b> matches</span><span class="dot">/</span><span>updated <b>${upd?upd.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</b></span>`;
@@ -390,8 +405,8 @@ function init(){
   buildSeg('seg-format',[{v:'all',t:'All'},{v:'standard',t:'Standard'},{v:'eternal',t:'Eternal'}],'format');
   buildSeg('seg-window',[{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}],'window');
   buildSeg('seg-smooth',[{v:'1',t:'Smoothed'},{v:'0',t:'Raw'}],'smooth');
-  buildSeg('tabs',[{v:'meta',t:'Meta'},{v:'conquest',t:'Conquest'},{v:'trends',t:'Trends'}],'view');
-  document.getElementById('foot').innerHTML='Riot LoR API · archetypes by champions + regions. <b>Smoothed</b> = empirical-Bayes shrinkage (κ pseudo-games → 50%). <b>Exp WR</b> = win rate vs the average opponent (play-weighted). <b>Conquest</b> tools enforce champion-lock; match win uses a minimax model over deck choice and bans. Small samples = soft numbers; everything sharpens as data grows.';
+  buildSeg('tabs',[{v:'meta',t:'Meta'},{v:'decks',t:'Decks'},{v:'stats',t:'Stats'},{v:'lineup',t:'Lineup'},{v:'analysis',t:'Analysis'}],'view');
+  document.getElementById('foot').innerHTML='Riot LoR API · regions via minimal-cover so multi-region cards don\'t over-count · win rates Bayes-smoothed (κ pseudo-games→50%) · decks shown at '+DECK_MIN+'+ games · Conquest tools enforce champion-lock. Composition + analysis sharpen as data grows.';
   render();
 }
 fetch('./data/stats.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{STATS=d;init();}).catch(e=>{document.getElementById('content').innerHTML=`<div class="empty-state"><b>Couldn't load stats.json</b>${e}</div>`;});
