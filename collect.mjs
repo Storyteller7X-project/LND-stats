@@ -132,6 +132,11 @@ function base32Decode(str) {
 }
 
 function decodeDeck(code) {
+  return decodeDeckCounts(code).map(c => c.code);
+}
+
+// jako decodeDeck, ale vrací i počet kopií: [{code, count}]
+function decodeDeckCounts(code) {
   const bytes = base32Decode(code);
   if (!bytes || bytes.length < 2) return [];
   let pos = 1;
@@ -152,44 +157,69 @@ function decodeDeck(code) {
         const set = varint();
         const faction = varint();
         for (let c = 0; c < numCards; c++) {
-          cards.push({ set, faction, num: varint() });
+          cards.push({ set, faction, num: varint(), count });
         }
       }
     }
     while (pos < bytes.length) {
-      varint();                 // count (nezajímá nás pro archetyp)
+      const count = varint();
       const set = varint(), faction = varint(), num = varint();
-      cards.push({ set, faction, num });
+      cards.push({ set, faction, num, count });
     }
   } catch { /* poškozený kód -> vrať co máme */ }
-  return cards.map(c =>
-    String(c.set).padStart(2, '0') + (FACTION_ID[c.faction] ?? '??') + String(c.num).padStart(3, '0')
-  );
+  return cards.map(c => ({
+    code: String(c.set).padStart(2, '0') + (FACTION_ID[c.faction] ?? '??') + String(c.num).padStart(3, '0'),
+    count: c.count
+  }));
 }
 
 // ---------------------------------------------------------------------------
 // Archetype label:  "Champ/champ (Region/region)" abecedně
-// Regiony odvozujeme PŘÍMO z kódů karet (např. 01NX038 -> NX), ne z pole
-// `factions` z API, které je nespolehlivé (u některých decků vrací reference
-// championa místo regionu). Kód karty má region vždy na pozici 2-3.
+// Region decku = MINIMÁLNÍ množina regionů pokrývající všechny karty.
+// Multiregionové karty (Scholar's Pioneer = FR+DE) se přiřadí k regionu, který
+// deck už má (z mono-region karet), takže nenafouknou region navíc.
+// `cardRegions` = code -> [regiony] pouze pro multiregionové karty (z Data Dragonu);
+// mono karty mají region v kódu (01NX038 -> NX).
 // ---------------------------------------------------------------------------
-function buildLabel(deckCode, factions, champMap) {
+function cardRegionsOf(code, cardRegions) {
+  const multi = cardRegions && cardRegions[code];
+  if (multi && multi.length) return multi;
+  const r = code.slice(2, 4);
+  return /^[A-Z]{2}$/.test(r) ? [r] : [];
+}
+function deckRegions(codes, cardRegions) {
+  const per = codes.map(c => cardRegionsOf(c, cardRegions)).filter(a => a.length);
+  const forced = new Set();
+  for (const regs of per) if (regs.length === 1) forced.add(regs[0]);   // mono karty určují jádro
+  let uncovered = per.filter(regs => regs.length > 1 && !regs.some(r => forced.has(r)));
+  while (uncovered.length) {                                           // pokrytí zbytku greedy
+    const counts = {};
+    for (const regs of uncovered) for (const r of regs) counts[r] = (counts[r] || 0) + 1;
+    const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+    forced.add(best);
+    uncovered = uncovered.filter(regs => !regs.some(r => forced.has(r)));
+  }
+  return [...forced].sort();
+}
+function buildLabel(deckCode, cardRegions, champMap) {
   const codes = decodeDeck(deckCode);
-  const regions = [...new Set(
-    codes.map(c => c.slice(2, 4)).filter(r => /^[A-Z]{2}$/.test(r))
-  )].sort();
-  const champs = [...new Set(
-    codes.map(code => champMap[code]).filter(Boolean)
-  )].sort();
+  const regions = deckRegions(codes, cardRegions);
+  const champs = [...new Set(codes.map(code => champMap[code]).filter(Boolean))].sort();
   const regionPart = regions.length ? `(${regions.join('/')})` : '(??)';
   return champs.length ? `${champs.join('/')} ${regionPart}` : `champless ${regionPart}`;
 }
 
 // ---------------------------------------------------------------------------
-// Data Dragon: cardCode -> jméno championa
+// Data Dragon: cardCode -> jméno championa  +  multiregionové karty -> [regiony]
 // ---------------------------------------------------------------------------
+const REGION_REF = {
+  Demacia: 'DE', Freljord: 'FR', Ionia: 'IO', Noxus: 'NX', PiltoverZaun: 'PZ',
+  ShadowIsles: 'SI', Bilgewater: 'BW', Shurima: 'SH', Targon: 'MT', MtTargon: 'MT',
+  BandleCity: 'BC', Runeterra: 'RU'
+};
 async function fetchChampMap(cfg) {
-  const map = {};
+  const map = {};          // cardCode -> champion name
+  const cardRegions = {};  // cardCode -> [region codes]  (jen multiregionové karty)
   for (const set of cfg.dataDragonSets) {
     const url = `https://dd.b.pvp.net/latest/${set}/en_us/data/${set}-en_us.json`;
     try {
@@ -197,16 +227,17 @@ async function fetchChampMap(cfg) {
       if (!res.ok) continue;
       const cards = await res.json();
       for (const c of cards) {
-        if (c && c.supertype === 'Champion' && c.cardCode && c.name) {
-          map[c.cardCode] = c.name;
-        }
+        if (!c || !c.cardCode) continue;
+        if (c.supertype === 'Champion' && c.name) map[c.cardCode] = c.name;
+        const regs = [...new Set((c.regionRefs || []).map(r => REGION_REF[r]).filter(Boolean))];
+        if (regs.length > 1) cardRegions[c.cardCode] = regs;   // ukládej jen multiregion
       }
     } catch (e) {
       console.warn(`[DataDragon] ${set} přeskočeno: ${e.message}`);
     }
   }
-  console.log(`[DataDragon] championů v mapě: ${Object.keys(map).length}`);
-  return map;
+  console.log(`[DataDragon] championů: ${Object.keys(map).length}, multiregion karet: ${Object.keys(cardRegions).length}`);
+  return { champMap: map, cardRegions };
 }
 
 // ---------------------------------------------------------------------------
@@ -309,6 +340,8 @@ async function main() {
   state.processed ??= [];
   state.days ??= {};
   state.champMap ??= {};
+  state.cardRegions ??= {};     // multiregionové karty pro správné regiony decku
+  state.comp ??= {};            // archetyp -> { n, c:{ cardCode:[decků, kopií] } }
   state.champFetchedAt ??= 0;
 
   const processed = new Set(state.processed);
@@ -318,18 +351,20 @@ async function main() {
   const perRegionMd = Math.max(1, Math.floor(cfg.maxMatchDetailsPerRun / cfg.regions.length));
   let mdGlobal = 0;  // detaily zápasů stažené v tomto běhu (hlídá 100/hod limit)
 
-  // Champ mapa (obnov jednou za champRefreshHours)
+  // Champ mapa + regiony karet (obnov jednou za champRefreshHours)
   const champStale = Date.now() - state.champFetchedAt > cfg.champRefreshHours * 3600_000;
   if (champStale || Object.keys(state.champMap).length === 0) {
     try {
       const fresh = await fetchChampMap(cfg);
-      if (Object.keys(fresh).length > 0) {
-        state.champMap = fresh;
+      if (Object.keys(fresh.champMap).length > 0) {
+        state.champMap = fresh.champMap;
+        state.cardRegions = fresh.cardRegions;
         state.champFetchedAt = Date.now();
       }
     } catch (e) { console.warn(`[DataDragon] ${e.message}`); }
   }
   const champMap = state.champMap;
+  const cardRegions = state.cardRegions || {};
 
   // Self-test dekodéru (sanity, neutratí requesty)
   const selfTest = decodeDeck('CEBAIAIFB4WDANQIAEAQGDAUDAQSIJZUAIAQCBIFAEAQCBAA')[0];
@@ -408,9 +443,19 @@ async function main() {
             }
 
             const [pa, pb] = players;
-            const la = buildLabel(pa.deck_code, pa.factions, champMap);
-            const lb2 = buildLabel(pb.deck_code, pb.factions, champMap);
+            const la = buildLabel(pa.deck_code, cardRegions, champMap);
+            const lb2 = buildLabel(pb.deck_code, cardRegions, champMap);
             const aWon = pa.game_outcome === 'win';
+
+            // složení decku per archetyp: kolik decků kartu hraje + kolik kopií celkem
+            for (const [lab, dc] of [[la, pa.deck_code], [lb2, pb.deck_code]]) {
+              const comp = (state.comp[lab] ??= { n: 0, c: {} });
+              comp.n++;
+              for (const { code, count } of decodeDeckCounts(dc)) {
+                const e = (comp.c[code] ??= [0, 0]);   // [decků, kopií]
+                e[0]++; e[1] += count;
+              }
+            }
 
             // formát: zatím SUROVÁ hodnota z API; po prvním běhu podle logu
             // [info SAMPLE] potvrdíme správné pole a mapování Standard/Eternal.
@@ -451,6 +496,16 @@ async function main() {
   // Prune + persist
   pruneDays(state.days, cfg.maxWindowDays);
   state.processed = [...processed].slice(-cfg.maxProcessedIds);
+  // comp: zahoď šum (n<2) a omez na top ~80 karet/archetyp, ať stav neroste
+  for (const [lab, c] of Object.entries(state.comp)) {
+    if (!c || c.n < 2) { delete state.comp[lab]; continue; }
+    const codes = Object.keys(c.c || {});
+    if (codes.length > 80) {
+      const keep = codes.sort((a, b) => c.c[b][0] - c.c[a][0]).slice(0, 80);
+      const nc = {}; for (const k of keep) nc[k] = c.c[k];
+      c.c = nc;
+    }
+  }
 
   await saveState(dbUrl, fbSecret, state);
 
@@ -465,7 +520,9 @@ async function main() {
       { key: '14d', label: '14 dní', days: 14 },
       { key: 'patch', label: 'Od patche', sincePatch: true }
     ],
-    days: state.days
+    days: state.days,
+    comp: state.comp,
+    champMap: state.champMap   // pro zobrazení jmen karet v sešitu
   };
   await fs.mkdir(path.dirname(STATS_PATH), { recursive: true });
   await fs.writeFile(STATS_PATH, JSON.stringify(stats));
