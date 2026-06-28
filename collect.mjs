@@ -351,9 +351,10 @@ async function main() {
   const perRegionMd = Math.max(1, Math.floor(cfg.maxMatchDetailsPerRun / cfg.regions.length));
   let mdGlobal = 0;  // detaily zápasů stažené v tomto běhu (hlídá 100/hod limit)
 
-  // Champ mapa + regiony karet (obnov jednou za champRefreshHours)
+  // Champ mapa + regiony karet (obnov jednou za champRefreshHours, nebo když chybí
+  // mapa multiregionových karet — ta se přidala později, takže ji starý cache nemá)
   const champStale = Date.now() - state.champFetchedAt > cfg.champRefreshHours * 3600_000;
-  if (champStale || Object.keys(state.champMap).length === 0) {
+  if (champStale || Object.keys(state.champMap).length === 0 || Object.keys(state.cardRegions || {}).length === 0) {
     try {
       const fresh = await fetchChampMap(cfg);
       if (Object.keys(fresh.champMap).length > 0) {
