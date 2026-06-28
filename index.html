@@ -144,7 +144,6 @@
 <div class="wrap">
   <div class="eyebrow">LND · Storyteller Project</div>
   <h1>Runeterra <em>Meta</em></h1>
-  <p class="sub">Live ranked stats + a full tournament toolkit. Win rates are Bayes-smoothed; decks need 20+ games to be ranked.</p>
   <div class="meta" id="meta"></div>
   <div class="controls">
     <div class="ctl"><span>Region</span><div class="seg" id="seg-region"></div></div>
@@ -174,7 +173,9 @@ function wrColor(wr){if(wr==null)return 'var(--mid)';const t=Math.max(0,Math.min
 function fmtWR(wr){return wr==null?'—':(wr*100).toFixed(0)+'%';}
 function fmtCI(lo,hi){return `${(lo*100).toFixed(0)}–${(hi*100).toFixed(0)}`;}
 function fmt1(x){return (x*100).toFixed(1)+'%';}
-function cardImg(code){const set=parseInt(code.slice(0,2),10)||1;return `https://dd.b.pvp.net/latest/set${set}/en_us/img/cards/${code}.png`;}
+function imgCandidates(code){const n=parseInt(code.slice(0,2),10)||1;const b='https://dd.b.pvp.net/latest';const f=[`set${n}`];if(n===6)f.push('set6cde');if(n===7)f.push('set7b');return f.map(x=>`${b}/${x}/en_us/img/cards/${code}.png`);}
+function cardImg(code){return imgCandidates(code)[0];}
+window.imgErr=function(img){const c=imgCandidates(img.dataset.code);let i=(+img.dataset.i||0)+1;if(i<c.length){img.dataset.i=i;img.src=c[i];}else{img.style.display='none';}};
 
 const DECK_MIN=20, META_MIN=0.01, CAND_N=14, FIELD_MIN=0.005;
 const state={region:'all',format:'all',window:null,sort:'play',selected:null,view:'meta',smooth:true,requireDeck:'',conqMode:'build',myLineup:null,oppLineup:null};
@@ -211,7 +212,7 @@ function computeDecks(deck,mu){
 }
 function makeMatchWin(mu){const memo=new Map();function mw(my,opp){if(!my.length)return 1;if(!opp.length)return 0;const key=my.join('|')+'#'+opp.join('|');if(memo.has(key))return memo.get(key);let best=-1;for(const i of my){let worst=2;for(const j of opp){const p=muCalc(mu,i,j);const v=p*mw(my.filter(x=>x!==i),opp)+(1-p)*mw(my,opp.filter(x=>x!==j));if(v<worst)worst=v;}if(worst>best)best=worst;}memo.set(key,best);return best;}return mw;}
 function banHelper(M,O,mw){let bestO=null,bestVal=-1,theirBan=null;for(const o of O){let worst=2,wm=null;for(const m of M){const v=mw(M.filter(x=>x!==m),O.filter(x=>x!==o));if(v<worst){worst=v;wm=m;}}if(worst>bestVal){bestVal=worst;bestO=o;theirBan=wm;}}return {banTheir:bestO,theyBan:theirBan,matchWin:bestVal};}
-function legalLineup(L){const seen=new Set();for(const d of L)for(const c of champsOf(d)){if(seen.has(c))return false;seen.add(c);}return true;}
+function legalLineup(L){const champs=new Set(),combos=new Set();for(const d of L){for(const c of champsOf(d)){if(champs.has(c))return false;champs.add(c);}const combo=regionsOf(d).slice().sort().join('/');if(combo){if(combos.has(combo))return false;combos.add(combo);}}return true;}
 function pickLineup(decks,exclude){const used=new Set(),out=[];for(const d of decks){if(out.length>=3)break;if(exclude&&exclude.has(d.label))continue;const ch=champsOf(d.label);if(ch.some(c=>used.has(c)))continue;ch.forEach(c=>used.add(c));out.push(d.label);}while(out.length<3)out.push('');return out;}
 
 // composition index (normalized labels)
@@ -227,14 +228,14 @@ function matchupCols(decks,mu,d){
   const beats=rows.filter(r=>W(r)>=0.5).sort((a,b)=>W(b)-W(a)||b.play-a.play).slice(0,12);
   const loses=rows.filter(r=>W(r)<0.5).sort((a,b)=>W(a)-W(b)||b.play-a.play).slice(0,12);
   const row=r=>`<div class="mrow"><div class="opp">${chips(r.opp)}<span>${deckName(r.opp)}</span></div><div class="sigd">${r.sig?'✓':''}</div><div class="pr">${fmt1(r.play)}</div><div class="rec">${r.g?r.wins+'/'+r.g:'—'}</div><div class="wrcell" style="color:${wrColor(W(r))}">${fmtWR(r.wr)}</div></div>`;
-  return `<div class="cols"><div><h4 class="good">Favored ▸ play vs these</h4>${beats.length?beats.map(row).join(''):'<div class="ci" style="padding:10px 0">None recorded.</div>'}</div>
-    <div><h4 class="bad">Unfavored ▸ these answer you</h4>${loses.length?loses.map(row).join(''):'<div class="ci" style="padding:10px 0">None recorded.</div>'}</div></div>`;
+  return `<div class="cols"><div><h4 class="good">Favored</h4>${beats.length?beats.map(row).join(''):'<div class="ci" style="padding:10px 0">—</div>'}</div>
+    <div><h4 class="bad">Unfavored</h4>${loses.length?loses.map(row).join(''):'<div class="ci" style="padding:10px 0">—</div>'}</div></div>`;
 }
 
 // ---------- META ----------
 function renderMeta(decks,total,mu){
   const shown=decks.filter(d=>d.games>=DECK_MIN);
-  if(!shown.length)return `<div class="empty-state"><b>No decks with ${DECK_MIN}+ games yet</b>The collector is gathering — this fills in as games accumulate. (Total ${total} appearances so far.)</div>`;
+  if(!shown.length)return `<div class="empty-state"><b>Not enough games yet</b></div>`;
   const maxPlay=Math.max(...shown.map(d=>d.play),1e-6);
   const sorted=shown.slice().sort((a,b)=>state.sort==='win'?(b.wr-a.wr||b.games-a.games):state.sort==='exp'?((b.expWR??0)-(a.expWR??0)||b.games-a.games):(b.games-a.games));
   const arrow=k=>state.sort===k?' ↓':'';
@@ -246,41 +247,40 @@ function renderMeta(decks,total,mu){
     <td class="num">${fmt1(d.play)}<div class="pbar"><i style="width:${(d.play/maxPlay*100).toFixed(0)}%"></i></div></td>
     <td class="num" style="color:var(--muted)">${d.games}</td><td class="num" style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</td>
     <td class="num ci">${fmtCI(d.ciLo,d.ciHi)}</td><td class="num" style="color:${d.expWR!=null?wrColor(d.expWR):'var(--faint)'}">${fmtWR(d.expWR)}</td></tr>`).join('')+`</tbody></table></div>`;
-  return `<section><div class="head"><h2>Meta decks</h2><span class="note">${shown.length} decks ≥${DECK_MIN} games · click for deck detail</span><span class="spacer"></span><button class="linkbtn" onclick="downloadCSV()">CSV</button></div>${table}</section>`;
+  return `<section><div class="head"><h2>Meta decks</h2><span class="spacer"></span><button class="linkbtn" onclick="downloadCSV()">CSV</button></div>${table}</section>`;
 }
 
 // ---------- DECKS (composition + matchups) ----------
 function renderDecks(decks,mu){
   const pool=decks.filter(d=>d.games>=DECK_MIN).sort((a,b)=>b.games-a.games);
-  if(!pool.length)return `<div class="empty-state"><b>No decks with ${DECK_MIN}+ games yet</b>Deck detail unlocks once archetypes reach the sample threshold.</div>`;
+  if(!pool.length)return `<div class="empty-state"><b>Not enough games yet</b></div>`;
   if(!state.selected||!decks.find(d=>d.label===state.selected))state.selected=pool[0].label;
   const opts=pool.map(d=>`<option value="${d.label}" ${d.label===state.selected?'selected':''}>${deckName(d.label)} (${regionsOf(d.label).join('/')}) · ${d.games}g</option>`).join('');
   const d=decks.find(x=>x.label===state.selected);
   const comp=compFor(state.selected);
   let compHtml;
-  if(!comp){compHtml=`<div class="empty-state" style="margin-top:18px"><b>Composition still collecting</b>Card data for this archetype hasn't accumulated yet — it appears once enough decklists are seen.</div>`;}
+  if(!comp){compHtml=`<div class="empty-state" style="margin-top:18px"><b>No card data yet</b></div>`;}
   else{
     const champs=comp.cards.filter(c=>c.isChamp);
     const core=comp.cards.filter(c=>!c.isChamp&&c.incl>=0.85);
     const flex=comp.cards.filter(c=>!c.isChamp&&c.incl>=0.2&&c.incl<0.85);
-    const cardEl=c=>`<div class="card"><img src="${cardImg(c.code)}" loading="lazy" alt="${CHAMPMAP[c.code]||c.code}" onerror="this.parentNode.classList.add('noimg');this.remove()"><span class="qty">×${c.typical}</span><span class="inc">${(c.incl*100).toFixed(0)}%</span>${CHAMPMAP[c.code]?`<span class="nm">${CHAMPMAP[c.code]}</span>`:''}</div>`;
-    const grp=(t,arr)=>arr.length?`<div class="subh" style="margin-top:18px">${t} · ${arr.length}</div><div class="cardgrid">${arr.map(cardEl).join('')}</div>`:'';
-    compHtml=`${grp('Champions',champs)}${grp('Core cards (≥85% of lists)',core)}${grp('Flex / tech slots (variable)',flex)}
-      <div class="ci" style="margin-top:14px">Based on ${comp.n} decklists · ×N = typical copies · % = how many lists run it · flex slots are where pilots differ</div>`;
+    const cardEl=c=>`<div class="card"><img src="${cardImg(c.code)}" data-code="${c.code}" data-i="0" loading="lazy" alt="${CHAMPMAP[c.code]||c.code}" onerror="imgErr(this)"><span class="qty">×${c.typical}</span><span class="inc">${(c.incl*100).toFixed(0)}%</span>${CHAMPMAP[c.code]?`<span class="nm">${CHAMPMAP[c.code]}</span>`:''}</div>`;
+    const grp=(t,arr)=>arr.length?`<div class="subh" style="margin-top:18px">${t}</div><div class="cardgrid">${arr.map(cardEl).join('')}</div>`:'';
+    compHtml=`${grp('Champions',champs)}${grp('Core',core)}${grp('Flex',flex)}`;
   }
   return `<div class="deckpick"><span>Deck:</span><select onchange="openDeck(this.value)">${opts}</select></div>
     <div class="panel gold"><div class="dtitle">${chips(d.label)} ${deckName(d.label)}</div>
       <div class="stat" style="margin-top:14px"><div><span class="k">Games</span><b>${d.games}</b></div><div><span class="k">Play</span><b>${fmt1(d.play)}</b></div>
         <div><span class="k">Win</span><b style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</b><span class="ci">${fmtCI(d.ciLo,d.ciHi)}</span></div>
         <div><span class="k">Exp WR vs field</span><b style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</b></div></div></div>
-    <section style="margin-top:0"><div class="head"><h2>Deck composition</h2><span class="note">average list · champions, core, flex</span></div>${compHtml}</section>
-    <section><div class="head"><h2>Matchups</h2><span class="note">✓ = significant</span></div>${matchupCols(decks,mu,d)}</section>`;
+    <section style="margin-top:0"><div class="head"><h2>Deck composition</h2></div>${compHtml}</section>
+    <section><div class="head"><h2>Matchups</h2></div>${matchupCols(decks,mu,d)}</section>`;
 }
 
 // ---------- STATS (matchup matrix) ----------
 function renderStats(decks,mu){
   const top=decks.filter(d=>d.games>=DECK_MIN).sort((a,b)=>b.games-a.games).slice(0,14);
-  if(top.length<2)return `<div class="empty-state"><b>Matrix needs ≥2 decks at ${DECK_MIN}+ games</b>Collecting…</div>`;
+  if(top.length<2)return `<div class="empty-state"><b>Not enough decks yet</b></div>`;
   const cell=(r,c)=>{if(r.label===c.label)return `<td class="diag">—</td>`;const wr=muWR(mu,r.label,c.label),g=muGames(mu,r.label,c.label);if(wr==null)return `<td class="empty">·</td>`;
     const e=mu[`${r.label}@@${c.label}`]||{wins:0,games:0},cls=(g>0&&g<5?'low ':'')+(muSig(mu,r.label,c.label)?'sig':'');
     return `<td class="${cls.trim()}" style="background:${wrColor(wr)}" title="${deckName(r.label)} vs ${deckName(c.label)} — ${g?e.wins+'/'+g:'no games'} · ${(wr*100).toFixed(0)}%">${(wr*100).toFixed(0)}</td>`;};
@@ -288,8 +288,8 @@ function renderStats(decks,mu){
     top.map(c=>`<th><div class="v" title="${c.label}" onclick="openDeck('${esc(c.label)}')">${deckName(c.label)}</div></th>`).join('')+`</tr></thead><tbody>`+
     top.map(r=>`<tr><th title="${r.label}" onclick="openDeck('${esc(r.label)}')">${deckName(r.label)}</th><td class="lead">${r.games}</td><td class="lead" style="color:${r.expWR!=null?wrColor(r.expWR):'var(--faint)'}">${fmtWR(r.expWR)}</td>`+
       top.map(c=>cell(r,c)).join('')+`</tr>`).join('')+`</tbody></table></div>
-    <div class="legend"><span>Unfavored</span><span class="scale"><i style="background:${wrColor(.35)}"></i><i style="background:${wrColor(.5)}"></i><i style="background:${wrColor(.65)}"></i></span><span>row vs column · ● = significant · faded = thin · click a name for deck detail</span></div>`;
-  return `<section><div class="head"><h2>Matchup matrix</h2><span class="note">top ${top.length} decks by play</span></div>${mx}</section>`;
+    <div class="legend"><span>Unfavored</span><span class="scale"><i style="background:${wrColor(.35)}"></i><i style="background:${wrColor(.5)}"></i><i style="background:${wrColor(.65)}"></i></span><span>row vs column</span></div>`;
+  return `<section><div class="head"><h2>Matchup matrix</h2></div>${mx}</section>`;
 }
 
 // ---------- LINEUP (conquest) ----------
@@ -303,7 +303,7 @@ function renderLineup(decks,mu){
     <button aria-pressed="${state.conqMode==='build'}" onclick="setConq('build')">Build vs meta</button>
     <button aria-pressed="${state.conqMode==='counter'}" onclick="setConq('counter')">Counter a lineup</button>
     <button aria-pressed="${state.conqMode==='ban'}" onclick="setConq('ban')">Ban helper</button></div>`;
-  if(cand.length<3)return sub+`<div class="empty-state"><b>Need 3+ decks at ${DECK_MIN}+ games</b>Lineup tools unlock once enough decks qualify.</div>`;
+  if(cand.length<3)return sub+`<div class="empty-state"><b>Not enough decks yet</b></div>`;
 
   if(state.conqMode==='build'){
     const field=decks.filter(d=>d.play>=FIELD_MIN);
@@ -314,26 +314,26 @@ function renderLineup(decks,mu){
     const opts=`<option value="">— any deck —</option>`+cand.map(d=>`<option value="${d.label}" ${d.label===state.requireDeck?'selected':''}>${deckName(d.label)}</option>`).join('');
     const cards=scored.length?`<div class="lineups">`+scored.map((x,i)=>`<div class="conq ${i===0?'top':''}"><div class="rank">#${i+1}</div><div class="cov" style="color:${wrColor(x.cov)}">${fmt1(x.cov)}</div><div class="covk">field coverage</div>
       <div class="decks">${x.L.map(l=>`<div class="d" onclick="openDeck('${esc(l)}')">${chips(l)}<span>${deckName(l)}</span>${l===x.linchpin?'<span class="lp">ban bait</span>':''}</div>`).join('')}</div>
-      <div class="foot">After worst ban: <b>${fmt1(x.postBan)}</b> · weakest vs <b>${x.weak.D?deckName(x.weak.D.label):'—'}</b> (${(x.weak.v*100).toFixed(0)}%)</div></div>`).join('')+`</div>`:`<div class="empty-state">No legal lineups (try clearing the required deck).</div>`;
-    return sub+`<div class="conqbar"><span>Require deck:</span><select onchange="setRequire(this.value)">${opts}</select><span style="color:var(--faint)">champion-lock enforced · coverage = best deck's win% into the average opponent</span></div>
-      <section style="margin-top:0"><div class="head"><h2>Best lineups vs the meta</h2><span class="note">from the ${cand.length} most-played</span></div>${cards}</section>`;
+      <div class="foot">After worst ban: <b>${fmt1(x.postBan)}</b> · weakest vs <b>${x.weak.D?deckName(x.weak.D.label):'—'}</b> (${(x.weak.v*100).toFixed(0)}%)</div></div>`).join('')+`</div>`:`<div class="empty-state">No legal lineups.</div>`;
+    return sub+`<div class="conqbar"><span>Require deck:</span><select onchange="setRequire(this.value)">${opts}</select></div>
+      <section style="margin-top:0"><div class="head"><h2>Best lineups vs the meta</h2></div>${cards}</section>`;
   }
   if(!state.oppLineup)state.oppLineup=pickLineup(cand,null);
   if(!state.myLineup)state.myLineup=pickLineup(cand,new Set(state.oppLineup.filter(Boolean)));
 
   if(state.conqMode==='counter'){
     const O=state.oppLineup.filter(Boolean);let body;
-    if(O.length<3){body=`<div class="empty-state">Pick the opponent's three decks.</div>`;}
+    if(O.length<3){body=`<div class="empty-state">Pick three decks.</div>`;}
     else{const lineups=[];for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++)for(let m=j+1;m<cand.length;m++){const L=[cand[i].label,cand[j].label,cand[m].label];if(legalLineup(L))lineups.push(L);}
       const scored=lineups.map(L=>({L,...banHelper(L,O,mw)})).sort((a,b)=>b.matchWin-a.matchWin).slice(0,9);
       body=`<div class="lineups">`+scored.map((x,i)=>`<div class="conq ${i===0?'top':''}"><div class="rank">#${i+1}</div><div class="cov" style="color:${wrColor(x.matchWin)}">${fmt1(x.matchWin)}</div><div class="covk">match win vs them</div>
         <div class="decks">${x.L.map(l=>`<div class="d" onclick="openDeck('${esc(l)}')">${chips(l)}<span>${deckName(l)}</span></div>`).join('')}</div>
         <div class="foot">Ban their <b>${deckName(x.banTheir)}</b> · they'll likely ban your <b>${deckName(x.theyBan)}</b></div></div>`).join('')+`</div>`;}
-    return sub+`<div class="lpick">${lineupBox('them','Opponent lineup','opp',state.oppLineup,allForPick)}<div class="box" style="display:flex;align-items:center;justify-content:center;color:var(--faint);font:500 12px/1.6 'Spline Sans Mono',monospace;text-align:center">Pick the 3 decks you expect.<br>We find your best legal counters.</div></div>
-      <section style="margin-top:0"><div class="head"><h2>Best counter-lineups</h2><span class="note">by match win after optimal bans</span></div>${body}</section>`;
+    return sub+`<div class="lpick">${lineupBox('them','Opponent lineup','opp',state.oppLineup,allForPick)}<div class="box" style="display:flex;align-items:center;justify-content:center;color:var(--faint);font:500 12px/1.6 'Spline Sans Mono',monospace;text-align:center">Opponent's 3 decks</div></div>
+      <section style="margin-top:0"><div class="head"><h2>Best counter-lineups</h2></div>${body}</section>`;
   }
   const M=state.myLineup.filter(Boolean),O=state.oppLineup.filter(Boolean);let res;
-  if(M.length<3||O.length<3){res=`<div class="empty-state">Pick all three decks for both lineups.</div>`;}
+  if(M.length<3||O.length<3){res=`<div class="empty-state">Pick all decks.</div>`;}
   else{const bh=banHelper(M,O,mw);const il=!legalLineup(M),io=!legalLineup(O);
     const g=`<table class="grid33"><thead><tr><th></th>${O.map(o=>`<th title="${o}">${deckName(o)}</th>`).join('')}</tr></thead><tbody>`+M.map(m=>`<tr><th title="${m}">${deckName(m)}</th>${O.map(o=>{const wr=muCalc(mu,m,o);return `<td style="background:${wrColor(wr)}">${(wr*100).toFixed(0)}</td>`;}).join('')}</tr>`).join('')+`</tbody></table>`;
     res=`<div class="panel gold banres"><div class="big"><div><div class="mk">Expected match win</div><div class="mwin" style="color:${wrColor(bh.matchWin)}">${fmt1(bh.matchWin)}</div></div>
@@ -341,7 +341,7 @@ function renderLineup(decks,mu){
       ${il||io?`<div class="ci" style="color:var(--bad);margin-top:12px">⚠ ${il?'Your':'Opponent'} lineup shares a champion (not legal).</div>`:''}
       <div class="ci" style="margin-top:14px">Your decks (rows) win% vs theirs (cols):</div>${g}</div>`;}
   return sub+`<div class="lpick">${lineupBox('me','Your lineup','my',state.myLineup,allForPick)}${lineupBox('them','Opponent lineup','opp',state.oppLineup,allForPick)}</div>
-    <section style="margin-top:0"><div class="head"><h2>Ban helper</h2><span class="note">optimal ban &amp; expected result</span></div>${res}</section>`;
+    <section style="margin-top:0"><div class="head"><h2>Ban helper</h2></div>${res}</section>`;
 }
 
 // ---------- ANALYSIS ----------
@@ -351,29 +351,22 @@ function renderAnalysis(decks,mu,inWin){
   const call=shown.slice().sort((a,b)=>(b.expWR??0)-(a.expWR??0)).slice(0,10);
   const callHtml=call.length?`<div class="scroll"><table class="list"><thead><tr><th>What to play</th><th class="num">Exp WR</th><th class="num">Play</th><th class="num">Win</th><th class="num">Games</th></tr></thead><tbody>`+
     call.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td><td class="num" style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</td><td class="num" style="color:var(--faint)">${d.games}</td></tr>`).join('')+`</tbody></table></div>`
-    :`<div class="empty-state">Needs decks at ${DECK_MIN}+ games.</div>`;
+    :`<div class="empty-state">—</div>`;
   // pocket picks
   const plays=shown.map(d=>d.play).sort((a,b)=>a-b);const med=plays[Math.floor(plays.length/2)]||0;
   const pocket=shown.filter(d=>d.play<=med&&d.expWR!=null&&d.expWR>0.5).sort((a,b)=>b.expWR-a.expWR).slice(0,6);
-  const pocketHtml=pocket.length?`<div class="scroll"><table class="list"><thead><tr><th>Sleeper</th><th class="num">Exp WR</th><th class="num">Play</th></tr></thead><tbody>`+pocket.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty-state">No clear sleepers yet.</div>`;
+  const pocketHtml=pocket.length?`<div class="scroll"><table class="list"><thead><tr><th>Sleeper</th><th class="num">Exp WR</th><th class="num">Play</th></tr></thead><tbody>`+pocket.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty-state">—</div>`;
   // trends
-  let trendHtml='<div class="empty-state">Need ≥2 days of data.</div>';
+  let trendHtml='<div class="empty-state">—</div>';
   if(inWin.length>=2){const rc=inWin[Math.max(0,inWin.length-2)];const tot={r:0,e:0};
     decks.forEach(d=>{d._r=0;d._e=0;for(const[day,x]of Object.entries(d.byDay||{})){if(day>=rc)d._r+=x.games;else d._e+=x.games;}tot.r+=d._r;tot.e+=d._e;});
     const rows=decks.map(d=>({label:d.label,dp:(tot.r?d._r/tot.r:0)-(tot.e?d._e/tot.e:0),rg:d._r,eg:d._e})).filter(r=>r.rg+r.eg>=DECK_MIN);
     const ri=rows.slice().sort((a,b)=>b.dp-a.dp).slice(0,6),fa=rows.slice().sort((a,b)=>a.dp-b.dp).slice(0,6);
     const tr=(r,up)=>`<div class="trow" onclick="openDeck('${esc(r.label)}')"><div class="nm">${chips(r.label)}<span>${deckName(r.label)}</span></div><div class="delta" style="color:${up?'var(--good)':'var(--bad)'}">${r.dp>=0?'+':''}${(r.dp*100).toFixed(1)}</div></div>`;
     trendHtml=`<div class="trend"><div><h4 class="good">▲ Rising</h4>${ri.length?ri.map(r=>tr(r,1)).join(''):'<div class="ci">—</div>'}</div><div><h4 class="bad">▼ Falling</h4>${fa.length?fa.map(r=>tr(r,0)).join(''):'<div class="ci">—</div>'}</div></div>`;}
-  // win-condition pro vybraný deck (jádro z compFor)
-  let wc='';
-  if(state.selected){const c=compFor(state.selected);
-    if(c){const eng=c.cards.filter(x=>x.incl>=0.85).slice(0,6);
-      wc=`<section><div class="head"><h2>Win condition — ${deckName(state.selected)}</h2><span class="note">core engine (highest-inclusion cards)</span></div>
-        <div class="cardgrid">${eng.map(x=>`<div class="card"><img src="${cardImg(x.code)}" loading="lazy" onerror="this.remove()"><span class="qty">×${x.typical}</span>${CHAMPMAP[x.code]?`<span class="nm">${CHAMPMAP[x.code]}</span>`:''}</div>`).join('')}</div>
-        <div class="ci" style="margin-top:12px">These cards appear in nearly every list — the deck's plan runs through them. Pick a deck in <b>Decks</b> to change this.</div></section>`;}}
-  return `<section><div class="head"><h2>Meta-call</h2><span class="note">expected win rate vs the current field — what to queue right now</span></div>${callHtml}</section>
-    <section><div class="head"><h2>Pocket picks</h2><span class="note">under-played but beat the field</span></div>${pocketHtml}</section>
-    <section><div class="head"><h2>Trends</h2><span class="note">play-rate shift, recent vs earlier</span></div>${trendHtml}</section>${wc}`;
+  return `<section><div class="head"><h2>Meta-call</h2></div>${callHtml}</section>
+    <section><div class="head"><h2>Pocket picks</h2></div>${pocketHtml}</section>
+    <section><div class="head"><h2>Trends</h2></div>${trendHtml}</section>`;
 }
 
 function render(){
@@ -381,7 +374,7 @@ function render(){
   document.getElementById('kappa').textContent=state.smooth?`κ=${KAPPA.toFixed(0)}`:'raw';
   const {decks,total}=computeDecks(deck,mu);
   const root=document.getElementById('content');
-  if(total===0){root.innerHTML=`<div class="empty-state"><b>No games here yet</b>Nothing for this region/format/window.</div>`;return;}
+  if(total===0){root.innerHTML=`<div class="empty-state"><b>No data</b></div>`;return;}
   root.innerHTML = state.view==='decks'?renderDecks(decks,mu):state.view==='stats'?renderStats(decks,mu):state.view==='lineup'?renderLineup(decks,mu):state.view==='analysis'?renderAnalysis(decks,mu,inWin):renderMeta(decks,total,mu);
 }
 window.setSort=k=>{state.sort=k;render();};
@@ -406,7 +399,7 @@ function init(){
   buildSeg('seg-window',[{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}],'window');
   buildSeg('seg-smooth',[{v:'1',t:'Smoothed'},{v:'0',t:'Raw'}],'smooth');
   buildSeg('tabs',[{v:'meta',t:'Meta'},{v:'decks',t:'Decks'},{v:'stats',t:'Stats'},{v:'lineup',t:'Lineup'},{v:'analysis',t:'Analysis'}],'view');
-  document.getElementById('foot').innerHTML='Riot LoR API · regions via minimal-cover so multi-region cards don\'t over-count · win rates Bayes-smoothed (κ pseudo-games→50%) · decks shown at '+DECK_MIN+'+ games · Conquest tools enforce champion-lock. Composition + analysis sharpen as data grows.';
+  document.getElementById('foot').innerHTML='';
   render();
 }
 fetch('./data/stats.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{STATS=d;init();}).catch(e=>{document.getElementById('content').innerHTML=`<div class="empty-state"><b>Couldn't load stats.json</b>${e}</div>`;});
