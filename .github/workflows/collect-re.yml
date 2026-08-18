@@ -2,7 +2,7 @@ name: collect-re
 
 on:
   schedule:
-    - cron: '15,45 * * * *'      # 2x za hodinu, posunuto od standardního collectoru (:00)
+    - cron: '15,45 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -29,11 +29,24 @@ jobs:
         run: |
           git config user.name "re-bot"
           git config user.email "actions@users.noreply.github.com"
-          node collect-re.mjs || echo "collect-re skoncil chybou"
-          git add data/re-stats.json
-          if ! git diff --cached --quiet; then
-            git commit -m "data: update re-stats [skip ci]"
-            git pull --rebase && git push || (git pull --rebase && git push) || echo "push selhal"
-          else
-            echo "zadna nova data"
+          echo "=== spoustim collector ==="
+          node collect-re.mjs || echo "collector skoncil chybou (viz vyse), pokracuju k ulozeni"
+          echo "=== commit/push re-stats.json ==="
+          if [ ! -f data/re-stats.json ]; then
+            echo "re-stats.json neexistuje (collector nic nezapsal) - koncim bez chyby"
+            exit 0
           fi
+          git add data/re-stats.json || true
+          if git diff --cached --quiet; then
+            echo "zadna zmena dat, necommituju"
+            exit 0
+          fi
+          git commit -m "data: update re-stats [skip ci]" || true
+          # odolny push: az 5 pokusu s rebase na aktualni main (standard collector pushuje soubezne)
+          for i in 1 2 3 4 5; do
+            if git push; then echo "push OK"; break; fi
+            echo "push #$i selhal, rebase a zkousim znovu"
+            git pull --rebase --autostash origin main || git rebase --abort || true
+            sleep 3
+          done
+          echo "hotovo"
