@@ -412,7 +412,8 @@ async function main() {
         if (infoSamples.length < 3) { const { players: _p, ...rest } = m.info; infoSamples.push(rest); }
 
         const parts = m.metadata?.participants || [];
-        if (parts.length !== 2 || !parts.every(p => rosterPuuids.has(p))) continue;  // FILTR
+        if (parts.length !== 2 || !parts.every(p => rosterPuuids.has(p))) continue;  // oba v rosteru
+        if (!/challenge/i.test(m.info.game_mode || '')) continue;                    // jen Bo3 challenge lobby (ladder)
         const players = m.info.players || [];
         if (players.length !== 2) continue;
         const dk = dayKey(m.info.game_start_time_utc); if (!dk) continue;
