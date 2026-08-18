@@ -29,7 +29,11 @@
   .seg button:hover{color:var(--ink)}
   .seg button[aria-pressed="true"]{background:var(--panel2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
   .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  .viewbar{display:flex;align-items:center;gap:16px;margin-top:30px;flex-wrap:wrap}
+  .dstabs{display:inline-flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:5px;margin-top:20px}
+  .dstabs button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:Fraunces,serif;font-weight:560;font-size:17px;padding:10px 22px;border-radius:9px;cursor:pointer}
+  .dstabs button[aria-pressed="true"]{background:var(--teal);color:#0b0f17}
+  .dstabs button:not([aria-pressed="true"]):hover{color:var(--ink)}
+  .viewbar{display:flex;align-items:center;gap:16px;margin-top:24px;flex-wrap:wrap}
   .tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;flex-wrap:wrap}
   .tabs button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:Fraunces,serif;font-weight:560;font-size:15.5px;padding:9px 16px;border-radius:8px;cursor:pointer}
   .tabs button[aria-pressed="true"]{background:var(--gold);color:#0b0f17}
@@ -144,6 +148,10 @@
 <div class="wrap">
   <div class="eyebrow">LND · Storyteller Project</div>
   <h1>Runeterra <em>Meta</em></h1>
+  <div class="dstabs" id="dstabs">
+    <button data-d="standard" aria-pressed="true" onclick="loadDataset('standard')">Standard</button>
+    <button data-d="re" aria-pressed="false" onclick="loadDataset('re')">Region Expressions</button>
+  </div>
   <div class="meta" id="meta"></div>
   <div class="controls">
     <div class="ctl"><span>Region</span><div class="seg" id="seg-region"></div></div>
@@ -396,13 +404,23 @@ function init(){
   const regions=STATS.regions||['europe','americas','asia'];
   buildSeg('seg-region',[{v:'all',t:'All'},...regions.map(r=>({v:r,t:REGION_LABEL[r]||r}))],'region');
   buildSeg('seg-format',[{v:'all',t:'All'},{v:'standard',t:'Standard'},{v:'eternal',t:'Eternal'}],'format');
-  buildSeg('seg-window',[{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}],'window');
+  const winOpts=(STATS.windows||[]).map(w=>w.sincePatch?{v:'patch',t:'Patch'}:{v:String(w.days),t:`${w.days}d`});
+  buildSeg('seg-window', winOpts.length?winOpts:[{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}], 'window');
   buildSeg('seg-smooth',[{v:'1',t:'Smoothed'},{v:'0',t:'Raw'}],'smooth');
   buildSeg('tabs',[{v:'meta',t:'Meta'},{v:'decks',t:'Decks'},{v:'stats',t:'Stats'},{v:'lineup',t:'Lineup'},{v:'analysis',t:'Analysis'}],'view');
   document.getElementById('foot').innerHTML='';
   render();
 }
-fetch('./data/stats.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{STATS=d;init();}).catch(e=>{document.getElementById('content').innerHTML=`<div class="empty-state"><b>Couldn't load stats.json</b>${e}</div>`;});
+let DATASET='standard';
+window.loadDataset=(name)=>{
+  DATASET=name;
+  document.querySelectorAll('#dstabs button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.d===name));
+  Object.assign(state,{view:'meta',selected:null,region:'all',format:'all',window:null,sort:'play',requireDeck:'',conqMode:'build',myLineup:null,oppLineup:null});
+  const file = name==='re' ? './data/re-stats.json' : './data/stats.json';
+  document.getElementById('content').innerHTML='<div class="empty-state">Loading…</div>';
+  fetch(file,{cache:'no-store'}).then(r=>r.json()).then(d=>{STATS=d;init();}).catch(e=>{document.getElementById('content').innerHTML=`<div class="empty-state"><b>Couldn't load ${name} data</b>${e}</div>`;});
+};
+loadDataset('standard');
 </script>
 </body>
 </html>

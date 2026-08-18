@@ -1,0 +1,52 @@
+name: collect-re
+
+on:
+  schedule:
+    - cron: '15,45 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect-re
+  cancel-in-progress: false
+
+jobs:
+  collect-re:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Collect Region Expressions
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+          NEATQUEUE_TOKEN: ${{ secrets.NEATQUEUE_TOKEN }}
+        run: |
+          git config user.name "re-bot"
+          git config user.email "actions@users.noreply.github.com"
+          echo "=== spoustim collector ==="
+          node collect-re.mjs || echo "collector skoncil chybou (viz vyse), pokracuju k ulozeni"
+          echo "=== commit/push re-stats.json ==="
+          if [ ! -f data/re-stats.json ]; then
+            echo "re-stats.json neexistuje (collector nic nezapsal) - koncim bez chyby"
+            exit 0
+          fi
+          git add data/re-stats.json || true
+          if git diff --cached --quiet; then
+            echo "zadna zmena dat, necommituju"
+            exit 0
+          fi
+          git commit -m "data: update re-stats [skip ci]" || true
+          # odolny push: az 5 pokusu s rebase na aktualni main (standard collector pushuje soubezne)
+          for i in 1 2 3 4 5; do
+            if git push; then echo "push OK"; break; fi
+            echo "push #$i selhal, rebase a zkousim znovu"
+            git pull --rebase --autostash origin main || git rebase --abort || true
+            sleep 3
+          done
+          echo "hotovo"
