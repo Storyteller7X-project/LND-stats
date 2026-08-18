@@ -1,0 +1,39 @@
+name: collect-re
+
+on:
+  schedule:
+    - cron: '15,45 * * * *'      # 2x za hodinu, posunuto od standardního collectoru (:00)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect-re
+  cancel-in-progress: false
+
+jobs:
+  collect-re:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Collect Region Expressions
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+          NEATQUEUE_TOKEN: ${{ secrets.NEATQUEUE_TOKEN }}
+        run: |
+          git config user.name "re-bot"
+          git config user.email "actions@users.noreply.github.com"
+          node collect-re.mjs || echo "collect-re skoncil chybou"
+          git add data/re-stats.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: update re-stats [skip ci]"
+            git pull --rebase && git push || (git pull --rebase && git push) || echo "push selhal"
+          else
+            echo "zadna nova data"
+          fi
