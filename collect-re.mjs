@@ -362,6 +362,7 @@ async function main() {
   state.champMap ??= {};
   state.cardRegions ??= {};
   state.comp ??= {};
+  state.matches ??= [];       // jednotlivé hry pro Bo3 sekci
   state.puuidCache ??= {};      // ign -> puuid
   state.puuidCluster ??= {};    // puuid -> cluster
   state.champFetchedAt ??= 0;
@@ -392,6 +393,7 @@ async function main() {
     catch (e) { if (e.message === 'RUN_CAP' || e.message === 'RATE_HALT') break; }
   }
   console.log(`[roster] PUUID vyřešeno: ${rosterPuuids.size}`);
+  const ignOf = {}; for (const [ign, pu] of Object.entries(state.puuidCache)) ignOf[pu] = ign;
 
   // 3) zápasy: jen ty, kde jsou OBA hráči v rosteru
   const processed = new Set(state.processed);
@@ -439,6 +441,12 @@ async function main() {
           bucket.matchups[kAB].games++; if (aWon) bucket.matchups[kAB].wins++;
           bucket.matchups[kBA].games++; if (!aWon) bucket.matchups[kBA].wins++;
         }
+        // jednotlivá hra do seznamu (frontend je seskupí do Bo3 série podle dvojice hráčů)
+        (state.matches ??= []).push({
+          t: m.info.game_start_time_utc,
+          aIgn: ignOf[parts[0]] || '?', aDeck: la,
+          bIgn: ignOf[parts[1]] || '?', bDeck: lb2, aWon
+        });
         recorded++;
       }
     }
@@ -450,6 +458,12 @@ async function main() {
   // prune + persist
   pruneDays(state.days, cfg.maxWindowDays);
   state.processed = [...processed].slice(-50000);
+  {
+    const seenM = new Set();
+    state.matches = (state.matches || []).filter(x => x && x.t).filter(x => { const k = x.t+'|'+x.aIgn+'|'+x.bIgn; if (seenM.has(k)) return false; seenM.add(k); return true; });
+    state.matches.sort((a,b)=>(a.t||'').localeCompare(b.t||''));
+    state.matches = state.matches.slice(-300);
+  }
   for (const [lab, c] of Object.entries(state.comp)) {
     if (!c || c.n < 2) { delete state.comp[lab]; continue; }
     const codes = Object.keys(c.c || {});
@@ -467,7 +481,7 @@ async function main() {
       { key: '30d', label: '30 dní', days: 30 },
       { key: 'patch', label: 'Od patche', sincePatch: true }
     ],
-    days: state.days, comp: state.comp, champMap: state.champMap
+    days: state.days, comp: state.comp, champMap: state.champMap, matches: state.matches
   };
   await fs.mkdir(path.dirname(STATS_PATH), { recursive: true });
   await fs.writeFile(STATS_PATH, JSON.stringify(stats));

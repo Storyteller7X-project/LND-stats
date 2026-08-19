@@ -140,6 +140,14 @@
   .close{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;margin-left:auto}.close:hover{color:var(--ink);border-color:var(--gold)}
   .empty-state{padding:46px 22px;text-align:center;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:14px}
   .empty-state b{color:var(--ink);display:block;margin-bottom:6px;font-size:15px}
+  .rematch{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .rm-players{display:flex;align-items:center;gap:18px;flex:1;flex-wrap:wrap}
+  .rm-p{display:flex;flex-direction:column;gap:6px;min-width:160px}
+  .rm-p.won .rm-ign{color:var(--good)}
+  .rm-ign{font-family:Fraunces,serif;font-weight:560;font-size:16px}
+  .rm-score{font:600 20px/1 "Spline Sans Mono",monospace;color:var(--gold)}
+  .rematch-deck{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);margin-right:10px}
+  .rm-date{font:500 11px/1 "Spline Sans Mono",monospace;color:var(--faint);margin-left:auto}
   footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font:500 12px/1.7 "Spline Sans Mono",monospace}footer b{color:var(--muted)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -147,15 +155,14 @@
 <body>
 <div class="wrap">
   <div class="eyebrow">LND · Storyteller Project</div>
-  <h1>Runeterra <em>Meta</em></h1>
+  <h1>#revive-<em>runeterra</em></h1>
   <div class="dstabs" id="dstabs">
-    <button data-d="standard" aria-pressed="true" onclick="loadDataset('standard')">Standard</button>
-    <button data-d="re" aria-pressed="false" onclick="loadDataset('re')">Region Expressions</button>
+    <button data-d="re" aria-pressed="true" onclick="loadDataset('re')">Region Expressions</button>
+    <button data-d="standard" aria-pressed="false" onclick="loadDataset('standard')">Under construction</button>
   </div>
   <div class="meta" id="meta"></div>
   <div class="controls">
     <div class="ctl"><span>Region</span><div class="seg" id="seg-region"></div></div>
-    <div class="ctl"><span>Format</span><div class="seg" id="seg-format"></div></div>
     <div class="ctl"><span>Window</span><div class="seg" id="seg-window"></div></div>
   </div>
   <div class="viewbar">
@@ -353,37 +360,45 @@ function renderLineup(decks,mu){
 }
 
 // ---------- ANALYSIS ----------
-function renderAnalysis(decks,mu,inWin){
-  const shown=decks.filter(d=>d.games>=DECK_MIN);
-  // meta-call: žebříček dle exp WR vs pole
-  const call=shown.slice().sort((a,b)=>(b.expWR??0)-(a.expWR??0)).slice(0,10);
-  const callHtml=call.length?`<div class="scroll"><table class="list"><thead><tr><th>What to play</th><th class="num">Exp WR</th><th class="num">Play</th><th class="num">Win</th><th class="num">Games</th></tr></thead><tbody>`+
-    call.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td><td class="num" style="color:${wrColor(d.wr)}">${fmtWR(d.wr)}</td><td class="num" style="color:var(--faint)">${d.games}</td></tr>`).join('')+`</tbody></table></div>`
-    :`<div class="empty-state">—</div>`;
-  // pocket picks
-  const plays=shown.map(d=>d.play).sort((a,b)=>a-b);const med=plays[Math.floor(plays.length/2)]||0;
-  const pocket=shown.filter(d=>d.play<=med&&d.expWR!=null&&d.expWR>0.5).sort((a,b)=>b.expWR-a.expWR).slice(0,6);
-  const pocketHtml=pocket.length?`<div class="scroll"><table class="list"><thead><tr><th>Sleeper</th><th class="num">Exp WR</th><th class="num">Play</th></tr></thead><tbody>`+pocket.map(d=>`<tr onclick="openDeck('${esc(d.label)}')"><td><div class="nm">${chips(d.label)}<span>${deckName(d.label)}</span></div></td><td class="num" style="color:${wrColor(d.expWR)}">${fmtWR(d.expWR)}</td><td class="num" style="color:var(--muted)">${fmt1(d.play)}</td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty-state">—</div>`;
-  // trends
-  let trendHtml='<div class="empty-state">—</div>';
-  if(inWin.length>=2){const rc=inWin[Math.max(0,inWin.length-2)];const tot={r:0,e:0};
-    decks.forEach(d=>{d._r=0;d._e=0;for(const[day,x]of Object.entries(d.byDay||{})){if(day>=rc)d._r+=x.games;else d._e+=x.games;}tot.r+=d._r;tot.e+=d._e;});
-    const rows=decks.map(d=>({label:d.label,dp:(tot.r?d._r/tot.r:0)-(tot.e?d._e/tot.e:0),rg:d._r,eg:d._e})).filter(r=>r.rg+r.eg>=DECK_MIN);
-    const ri=rows.slice().sort((a,b)=>b.dp-a.dp).slice(0,6),fa=rows.slice().sort((a,b)=>a.dp-b.dp).slice(0,6);
-    const tr=(r,up)=>`<div class="trow" onclick="openDeck('${esc(r.label)}')"><div class="nm">${chips(r.label)}<span>${deckName(r.label)}</span></div><div class="delta" style="color:${up?'var(--good)':'var(--bad)'}">${r.dp>=0?'+':''}${(r.dp*100).toFixed(1)}</div></div>`;
-    trendHtml=`<div class="trend"><div><h4 class="good">▲ Rising</h4>${ri.length?ri.map(r=>tr(r,1)).join(''):'<div class="ci">—</div>'}</div><div><h4 class="bad">▼ Falling</h4>${fa.length?fa.map(r=>tr(r,0)).join(''):'<div class="ci">—</div>'}</div></div>`;}
-  return `<section><div class="head"><h2>Meta-call</h2></div>${callHtml}</section>
-    <section><div class="head"><h2>Pocket picks</h2></div>${pocketHtml}</section>
-    <section><div class="head"><h2>Trends</h2></div>${trendHtml}</section>`;
+function renderBo3Matches(){
+  const games=(STATS.matches||[]).slice();
+  if(!games.length) return `<section><div class="head"><h2>Bo3 matches</h2></div><div class="empty-state"><b>No Bo3 matches yet</b>Ladder games appear here as they're played.</div></section>`;
+  games.sort((a,b)=>(b.t||'').localeCompare(a.t||''));
+  const nm=i=>String(i||'?').split('#')[0];
+  const key=g=>[g.aIgn,g.bIgn].sort().join('|');
+  const series=[];
+  for(const g of games){
+    let sx=series.find(x=>x.key===key(g)&&Math.abs(new Date(x.t0)-new Date(g.t))<2*3600e3);
+    if(!sx){sx={key:key(g),t0:g.t,games:[]};series.push(sx);}
+    sx.games.push(g);
+  }
+  const deckChips=set=>[...set].map(d=>`<span class="rematch-deck">${chips(d)}${deckName(d)}</span>`).join('');
+  const row=sx=>{
+    const P={};
+    for(const g of sx.games){
+      P[g.aIgn]??={ign:g.aIgn,wins:0,decks:new Set()};
+      P[g.bIgn]??={ign:g.bIgn,wins:0,decks:new Set()};
+      (g.aWon?P[g.aIgn]:P[g.bIgn]).wins++;
+      P[g.aIgn].decks.add(g.aDeck);P[g.bIgn].decks.add(g.bDeck);
+    }
+    const ps=Object.values(P);if(ps.length<2)return '';
+    ps.sort((a,b)=>b.wins-a.wins);const[p1,p2]=ps;
+    const date=new Date(sx.t0).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div class="rematch"><div class="rm-players">
+      <div class="rm-p ${p1.wins>p2.wins?'won':''}"><span class="rm-ign">${nm(p1.ign)}</span>${deckChips(p1.decks)}</div>
+      <div class="rm-score">${p1.wins}–${p2.wins}</div>
+      <div class="rm-p ${p2.wins>p1.wins?'won':''}"><span class="rm-ign">${nm(p2.ign)}</span>${deckChips(p2.decks)}</div>
+    </div><div class="rm-date">${date}</div></div>`;
+  };
+  return `<section><div class="head"><h2>Bo3 matches</h2><span class="note">${series.length} series</span></div>${series.map(row).join('')}</section>`;
 }
-
 function render(){
   const {deck,mu,inWin}=aggregate();KAPPA=estimateKappa(mu);
   document.getElementById('kappa').textContent=state.smooth?`κ=${KAPPA.toFixed(0)}`:'raw';
   const {decks,total}=computeDecks(deck,mu);
   const root=document.getElementById('content');
   if(total===0){root.innerHTML=`<div class="empty-state"><b>No data</b></div>`;return;}
-  root.innerHTML = state.view==='decks'?renderDecks(decks,mu):state.view==='stats'?renderStats(decks,mu):state.view==='lineup'?renderLineup(decks,mu):state.view==='analysis'?renderAnalysis(decks,mu,inWin):renderMeta(decks,total,mu);
+  root.innerHTML = state.view==='decks'?renderDecks(decks,mu):state.view==='stats'?renderStats(decks,mu):state.view==='lineup'?renderLineup(decks,mu):state.view==='bo3'?renderBo3Matches():renderMeta(decks,total,mu);
 }
 window.setSort=k=>{state.sort=k;render();};
 window.openDeck=l=>{state.selected=l;state.view='decks';syncTabs();render();window.scrollTo({top:0,behavior:'smooth'});};
@@ -403,24 +418,30 @@ function init(){
   document.getElementById('meta').innerHTML=`<span>Patch <b>${STATS.patchStart||'—'}</b></span><span class="dot">/</span><span><b>${Math.round(tg/2)}</b> matches</span><span class="dot">/</span><span>updated <b>${upd?upd.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</b></span>`;
   const regions=STATS.regions||['europe','americas','asia'];
   buildSeg('seg-region',[{v:'all',t:'All'},...regions.map(r=>({v:r,t:REGION_LABEL[r]||r}))],'region');
-  buildSeg('seg-format',[{v:'all',t:'All'},{v:'standard',t:'Standard'},{v:'eternal',t:'Eternal'}],'format');
   const winOpts=(STATS.windows||[]).map(w=>w.sincePatch?{v:'patch',t:'Patch'}:{v:String(w.days),t:`${w.days}d`});
   buildSeg('seg-window', winOpts.length?winOpts:[{v:'2',t:'2d'},{v:'7',t:'7d'},{v:'14',t:'14d'},{v:'patch',t:'Patch'}], 'window');
   buildSeg('seg-smooth',[{v:'1',t:'Smoothed'},{v:'0',t:'Raw'}],'smooth');
-  buildSeg('tabs',[{v:'meta',t:'Meta'},{v:'decks',t:'Decks'},{v:'stats',t:'Stats'},{v:'lineup',t:'Lineup'},{v:'analysis',t:'Analysis'}],'view');
+  buildSeg('tabs',[{v:'meta',t:'Meta'},{v:'decks',t:'Decks'},{v:'stats',t:'Stats'},{v:'lineup',t:'Lineup'},{v:'bo3',t:'Bo3 matches'}],'view');
   document.getElementById('foot').innerHTML='';
   render();
 }
-let DATASET='standard';
+let DATASET='re';
+function toggleControls(show){for(const sel of ['.controls','.viewbar']){const el=document.querySelector(sel);if(el)el.style.display=show?'':'none';}}
 window.loadDataset=(name)=>{
   DATASET=name;
   document.querySelectorAll('#dstabs button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.d===name));
+  if(name==='standard'){
+    toggleControls(false);
+    document.getElementById('meta').innerHTML='';
+    document.getElementById('content').innerHTML='<div class="empty-state" style="padding:90px 22px"><b style="font-size:24px">\uD83D\uDEA7 Under construction</b>Standard meta is being rebuilt. Data is quietly being collected and will appear here later.</div>';
+    return;
+  }
+  toggleControls(true);
   Object.assign(state,{view:'meta',selected:null,region:'all',format:'all',window:null,sort:'play',requireDeck:'',conqMode:'build',myLineup:null,oppLineup:null});
-  const file = name==='re' ? './data/re-stats.json' : './data/stats.json';
-  document.getElementById('content').innerHTML='<div class="empty-state">Loading…</div>';
-  fetch(file,{cache:'no-store'}).then(r=>r.json()).then(d=>{STATS=d;init();}).catch(e=>{document.getElementById('content').innerHTML=`<div class="empty-state"><b>Couldn't load ${name} data</b>${e}</div>`;});
+  document.getElementById('content').innerHTML='<div class="empty-state">Loading\u2026</div>';
+  fetch('./data/re-stats.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{STATS=d;init();}).catch(e=>{document.getElementById('content').innerHTML=`<div class="empty-state"><b>Couldn't load data</b>${e}</div>`;});
 };
-loadDataset('standard');
+loadDataset('re');
 </script>
 </body>
 </html>
